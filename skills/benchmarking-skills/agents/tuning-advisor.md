@@ -1,36 +1,36 @@
-# Tuning Advisor — แปลงผลคะแนนเป็นคำสั่งปรับ skill ที่เป็นรูปธรรม
-*Phase 5. input คือ scorecard + grading ทุก run + Contract. output คือ tuning-report.md*
+# Tuning Advisor — turn scores into concrete skill-fix instructions
+*Phase 5. Input is the scorecard + every run's grading + the Contract. Output is tuning-report.md*
 
-## Input ที่ orchestrator ต้องใส่ให้
-- **scorecard.json / scorecard.md** (จาก Phase 4)
-- **grading.json ทุก run** — เอา `evidence` ที่ judge quote ไว้ (หลักฐานของแต่ละ finding)
+## Input the orchestrator must provide
+- **scorecard.json / scorecard.md** (from Phase 4)
+- **every run's grading.json** — take the `evidence` the judge quoted (the proof behind each finding)
 - **Skill Contract** (Phase 0)
-- **path คู่มือเทคนิคการเขียน skill:** `../references/skill-authoring-techniques.md` — อ้างเทคนิคจากไฟล์นี้ในทุกคำแนะนำ
+- **path to the skill-authoring techniques guide:** `../references/skill-authoring-techniques.md` — cite techniques from this file in every recommendation
 
-## งาน
-สำหรับแต่ละ **มิติคะแนนต่ำ / flag / จุดพัง** → เสนอ **คำสั่งแก้ skill ที่เป็นรูปธรรม** ที่อ้างเทคนิคจากคู่มือ authoring. ตัวอย่าง mapping finding → fix:
+## The task
+For each **low-scoring dimension / flag / failure point** → propose a **concrete skill-fix instruction** that cites a technique from the authoring guide. Example finding → fix mapping:
 
-| อาการ (จาก scorecard/grading) | คำสั่งแก้ (อ้างเทคนิค) |
+| Symptom (from scorecard/grading) | Fix instruction (citing a technique) |
 |---|---|
-| `workflow_adherence` ต่ำ — agent ข้าม gate | เพิ่ม rationalization table ที่ quote ข้ออ้างจริงจาก transcript + red-flag list (เทคนิค: ปิดช่องโหว่ discipline skill) |
-| `decision_quality` ต่ำ — เลือกถูกแต่เหตุผลไม่ตรงเกณฑ์ | ทำเกณฑ์จุดแยกให้ตรวจสอบได้ชัดขึ้น (anchor เป็นคำที่เช็คได้ ไม่ใช่ดุลพินิจ) |
-| `robustness` ต่ำ — พังเพราะ time-pressure | เพิ่มกฎ "pressure changes depth, not steps" + ใส่ข้ออ้างที่พังลง rationalization table verbatim |
-| `triggering` ต่ำ — under-trigger | ปรับ description: "ทำอะไร + Use when" + keyword ที่ผู้ใช้พูดจริง; อย่าสรุป workflow (เทคนิค description) |
-| `triggering` ต่ำ — over-trigger (near-miss ติด) | เพิ่ม "Do not use when" + ขอบเขตที่ไม่ทับ skill อื่น |
-| flag `high_variance` | คะแนน flaky — สเต็ป/เกณฑ์กำกวม ทำให้ตีความต่างรอบ → ทำให้ deterministic ขึ้น |
-| flag `non_discriminating` (skill ~ baseline) | skill แทบไม่สร้าง delta ในมิตินั้น — ตัดส่วนที่ไม่ pulling weight หรือคิดใหม่ว่ามิตินั้น skill ควรช่วยยังไง |
-| `wasted_work_notes` ซ้ำหลาย run | ถ้าทุก run ทำงานซ้ำเหมือนกัน (เช่นเขียน helper เดิม) → bundle เป็น script (เทคนิค: bundled resources) |
+| `workflow_adherence` low — agent skips a gate | Add a rationalization table quoting the real excuses from the transcript + a red-flag list (technique: closing discipline-skill loopholes) |
+| `decision_quality` low — correct choice but reasoning off-criteria | Make the branch criteria more checkable (anchors as checkable words, not judgment calls) |
+| `robustness` low — broke under time-pressure | Add the rule "pressure changes depth, not steps" + put the excuse that broke it into the rationalization table verbatim |
+| `triggering` low — under-trigger | Tune the description: "what it does + Use when" + the keywords the user actually says; don't summarize the workflow (description technique) |
+| `triggering` low — over-trigger (near-miss fires) | Add "Do not use when" + the boundary that doesn't overlap another skill |
+| flag `high_variance` | Flaky scores — an ambiguous step/criterion interpreted differently each round → make it more deterministic |
+| flag `non_discriminating` (skill ~ baseline) | The skill creates almost no delta on that dimension — cut what isn't pulling weight, or rethink how the skill should help on that dimension |
+| `wasted_work_notes` repeating across runs | If every run repeats the same work (e.g. writing the same helper) → bundle it into a script (technique: bundled resources) |
 
 ## Output — tuning-report.md
-เรียงตามความสำคัญ (impact สูง + หลักฐานชัด ก่อน). แต่ละข้อมี:
+Ordered by importance (high impact + clear evidence first). Each item has:
 ```markdown
-### [P1] <อาการสั้น ๆ>
-- **หลักฐาน:** <quote จาก grading evidence — run ไหน คะแนนเท่าไร>
-- **สาเหตุที่เดา:** <ทำไม skill ถึงทำให้เกิดอาการนี้>
-- **คำสั่งแก้:** <รูปธรรม แก้บรรทัด/ส่วนไหน ยังไง> (เทคนิค: <ชื่อเทคนิคจากคู่มือ>)
-- **คาดว่าจะดีขึ้น:** <มิติไหน>
+### [P1] <short symptom>
+- **Evidence:** <quote from the grading evidence — which run, what score>
+- **Likely cause:** <why the skill produces this symptom>
+- **Fix instruction:** <concrete: which line/section to change, how> (technique: <technique name from the guide>)
+- **Expected improvement:** <which dimension>
 ```
-ปิดท้ายด้วย: เสนอวน **edit → re-benchmark iteration ถัดไป → เทียบ delta** เพื่อยืนยันว่าแก้แล้วดีขึ้นจริง
+End with: propose the **edit → re-benchmark next iteration → compare delta** loop to confirm the fix actually improved things.
 
-## กฎ
-**ทุกคำแนะนำต้องผูกกับหลักฐานจริงใน grading.json** — ห้ามแนะนำลอย ๆ ที่ไม่มี finding รองรับ (เช่น "ควรเพิ่มตัวอย่าง" ทั้งที่ไม่มีคะแนนไหนชี้ปัญหานั้น). ถ้าไม่มี finding = ไม่มีคำแนะนำ
+## Rule
+**Every recommendation must tie to real evidence in grading.json** — no floating advice with no finding behind it (e.g. "should add examples" when no score points to that problem). No finding = no recommendation.

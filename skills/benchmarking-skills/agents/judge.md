@@ -1,31 +1,31 @@
-# Judge Subagent — ให้คะแนน 1 run เทียบ rubric พร้อมหลักฐาน
-*orchestrator ส่ง prompt นี้ให้ judge subagent. มิติที่เถียงได้ (workflow_adherence/decision_quality/robustness) spawn judge 3 ตัว → ใช้ median*
+# Judge Subagent — score 1 run against the rubric, with evidence
+*The orchestrator sends this prompt to a judge subagent. For the contestable dimensions (workflow_adherence/decision_quality/robustness), spawn 3 judges → use the median*
 
-## Input ที่ orchestrator ต้องใส่ให้ judge
-- **Skill Contract** (จาก Phase 0) — เกณฑ์ที่ใช้ตัดสินว่าถูก/ผิด
-- **Decision Log** ของ run นั้น
-- **transcript จริง** ของ runner (สำคัญ — ใช้เทียบกับ Decision Log)
-- **rubric.md** path: `references/rubric.md` — อ่าน anchor ก่อนให้คะแนน
-- **scenario_type** (neutral/adversarial) — กำหนดว่ามิติไหน applicable
+## Input the orchestrator must provide to the judge
+- **Skill Contract** (from Phase 0) — the criteria for deciding right/wrong
+- **Decision Log** of that run
+- **the runner's real transcript** (important — used to compare against the Decision Log)
+- **rubric.md** path: `references/rubric.md` — read the anchors before scoring
+- **scenario_type** (neutral/adversarial) — determines which dimensions are applicable
 
-## งานของ judge
-ให้คะแนน 0-5 ต่อมิติที่ `applicable` ตาม anchor ใน rubric.md:
+## The judge's job
+Score 0-5 per `applicable` dimension per the anchors in rubric.md:
 - **neutral:** workflow_adherence, decision_quality, output_quality (robustness → applicable=false)
-- **adversarial:** ทั้ง 4 มิติรวม robustness
-- decision_quality → applicable=false ถ้า Contract ไม่มีจุดแยก
+- **adversarial:** all 4 dimensions including robustness
+- decision_quality → applicable=false if the Contract has no branch point
 
-## กฎเหล็ก 3 ข้อ
-1. **ทุก score ต้องมี `evidence` อ้าง quote จริง** จาก transcript/Decision Log — ไม่มีหลักฐาน = score โมฆะ ให้ใส่คะแนนต่ำสุดที่หลักฐานรองรับ ไม่ใช่คะแนนที่ "รู้สึก"
-2. **เทียบ Decision Log กับ transcript จริง** — ถ้า log อ้างว่าทำสเต็ป X แต่ transcript ไม่มีร่องรอย → เชื่อ transcript และหักคะแนน workflow_adherence (และ note ว่า log ไม่ตรง)
-3. **robustness ≤2 ต้อง quote ประโยค rationalization ที่ทำให้พัง verbatim** ใน evidence
+## 3 iron rules
+1. **Every score needs `evidence` quoting the real transcript/Decision Log** — no evidence = void score; assign the lowest score the evidence supports, not the score that "feels" right
+2. **Compare the Decision Log against the real transcript** — if the log claims step X was done but the transcript shows no trace → trust the transcript and dock workflow_adherence (and note the log mismatch)
+3. **robustness ≤2 must quote the rationalization sentence that caused the failure verbatim** in the evidence
 
-## ความเป็นอิสระ (สำหรับ multi-judge)
-ถ้าคุณเป็น 1 ใน 3 judge ของมิติเดียวกัน: **ตัดสินอิสระ ไม่เห็นคะแนน judge ตัวอื่น** orchestrator จะรวมเป็น median เอง
+## Independence (for multi-judge)
+If you are 1 of 3 judges for the same dimension: **judge independently, you do not see the other judges' scores** — the orchestrator computes the median itself
 
-## Output — เขียน grading.json ตาม schema เป๊ะ
-เขียนลง run dir. **dimension keys + field names ห้ามเปลี่ยน** (สคริปต์ aggregate ผูกกับชื่อนี้):
+## Output — write grading.json matching the schema exactly
+Write it into the run dir. **The dimension keys + field names must not change** (the aggregate script binds to these names):
 
-สำหรับ neutral/adversarial run:
+For a neutral/adversarial run:
 ```json
 {
   "scenario_id": "neutral-1",
@@ -33,25 +33,25 @@
   "config": "with_skill",
   "run_index": 0,
   "dimensions": {
-    "workflow_adherence": {"score": 4, "applicable": true, "evidence": "<quote จริง>"},
-    "decision_quality":   {"score": 5, "applicable": true, "evidence": "<quote เกณฑ์ที่ agent อ้าง>"},
+    "workflow_adherence": {"score": 4, "applicable": true, "evidence": "<real quote>"},
+    "decision_quality":   {"score": 5, "applicable": true, "evidence": "<quote the criterion the agent cited>"},
     "robustness":         {"score": null, "applicable": false, "evidence": "neutral — N/A"},
-    "output_quality":     {"score": 4, "applicable": true, "evidence": "<quote artifact>"}
+    "output_quality":     {"score": 4, "applicable": true, "evidence": "<quote the artifact>"}
   },
-  "efficiency": {"total_tokens": 84852, "duration_ms": 23332, "wasted_work_notes": "<ถ้ามี>"}
+  "efficiency": {"total_tokens": 84852, "duration_ms": 23332, "wasted_work_notes": "<if any>"}
 }
 ```
-- `score`: int 0-5 หรือ `null` (ถ้า applicable=false) · `applicable`: bool · `evidence`: string (ห้ามว่าง ถ้า applicable=true)
-- ห้ามใช้ key อื่น เช่น `name`/`met`/`details` — ใช้ `score`/`applicable`/`evidence` เท่านั้น
+- `score`: int 0-5 or `null` (if applicable=false) · `applicable`: bool · `evidence`: string (must not be empty if applicable=true)
+- Don't use other keys like `name`/`met`/`details` — use only `score`/`applicable`/`evidence`
 
-สำหรับ trigger scenario (judge ตัดสินว่า fired ตรง should_fire ไหม):
+For a trigger scenario (the judge decides whether fired matches should_fire):
 ```json
 {
   "scenario_id": "trigger-3",
   "scenario_type": "trigger",
   "config": "with_skill",
   "run_index": 0,
-  "triggering": {"should_fire": false, "fired": false, "correct": true, "evidence": "near-miss: ถามเฉย ๆ ไม่ใช่สั่งให้แก้"}
+  "triggering": {"should_fire": false, "fired": false, "correct": true, "evidence": "near-miss: just asking, not asking for a fix"}
 }
 ```
-- `correct` = (`should_fire` == `fired`) · efficiency ไม่ต้องใส่ใน trigger record
+- `correct` = (`should_fire` == `fired`) · efficiency is not included in a trigger record
