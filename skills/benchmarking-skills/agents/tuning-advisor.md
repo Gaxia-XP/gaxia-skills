@@ -5,7 +5,7 @@
 - **scorecard.json / scorecard.md** (จาก Phase 4)
 - **grading.json ทุก run** — เอา `evidence` ที่ judge quote ไว้ (หลักฐานของแต่ละ finding)
 - **Skill Contract** (Phase 0)
-- **path คู่มือเทคนิคการเขียน skill:** `G:\My Drive\Workspace-v2\AI-Skill\skill-authoring-techniques-2026-06-15.md` — อ้างเทคนิคจากไฟล์นี้ในทุกคำแนะนำ
+- **path คู่มือเทคนิคการเขียน skill:** `../references/skill-authoring-techniques.md` — อ้างเทคนิคจากไฟล์นี้ในทุกคำแนะนำ
 
 ## งาน
 สำหรับแต่ละ **มิติคะแนนต่ำ / flag / จุดพัง** → เสนอ **คำสั่งแก้ skill ที่เป็นรูปธรรม** ที่อ้างเทคนิคจากคู่มือ authoring. ตัวอย่าง mapping finding → fix:

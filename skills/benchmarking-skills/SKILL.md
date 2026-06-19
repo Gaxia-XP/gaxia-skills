@@ -41,7 +41,7 @@ python aggregate_scorecard.py <iteration_dir> --skill-name <target-name>
 **Exit:** scorecard.md สร้างแล้ว
 
 ### Phase 5 — Tune: รายงานแนวทางปรับ
-ตาม `agents/tuning-advisor.md`: map คะแนนต่ำ/flag/จุดพัง → คำสั่งแก้รูปธรรม อ้างเทคนิคจาก `skill-authoring-techniques-2026-06-15.md` → `tuning-report.md` เรียงตามความสำคัญ.
+ตาม `agents/tuning-advisor.md`: map คะแนนต่ำ/flag/จุดพัง → คำสั่งแก้รูปธรรม อ้างเทคนิคจาก `references/skill-authoring-techniques.md` → `tuning-report.md` เรียงตามความสำคัญ.
 **Exit:** tuning-report.md ทุกข้อผูกหลักฐานจริง
 
 ## Scale & rate-limit robustness (Phase 2-3 fan-out)
