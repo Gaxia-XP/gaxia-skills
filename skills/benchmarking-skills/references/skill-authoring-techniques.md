@@ -1,225 +1,225 @@
-# เทคนิคการสร้าง SKILL.md ที่มีประสิทธิภาพ
-*ค้นคว้าและตรวจสอบเมื่อ 2026-06-15 — ขุดจาก skill สอนเขียน skill ที่ติดตั้งในเครื่อง (superpowers:writing-skills, mattpocock:write-a-skill, skill-creator, creating-workflow-skills) + งานวิจัยเว็บ (เอกสารทางการ Anthropic) · 20 agents · verify 14 claim หลักแบบ adversarial*
+# Techniques for writing an effective SKILL.md
+*Researched and verified 2026-06-15 — mined from the skill-authoring skills installed locally (superpowers:writing-skills, mattpocock:write-a-skill, skill-creator, creating-workflow-skills) + web research (official Anthropic docs) · 20 agents · 14 key claims verified adversarially*
 
-> **กฎเหล็กของเอกสารนี้:** ทุกข้อกำกับว่าเป็น **[ทางการ]** (อยู่ในเอกสาร Anthropic อย่างเป็นทางการ) หรือ **[ชุมชน]** (ธรรมเนียมของ superpowers/obra/mattpocock — ได้ผลจริงแต่เป็น house style ไม่ใช่มาตรฐาน) — เพราะ verify phase พบว่าหลายเทคนิคที่คนเข้าใจว่า "เป็นกฎ" จริง ๆ เป็นความเห็นของ framework เดียว
+> **The iron rule of this document:** every item is tagged **[Official]** (present in Anthropic's official docs) or **[Community]** (a convention of superpowers/obra/mattpocock — works in practice but is house style, not a standard) — because the verify phase found that many techniques people assume are "rules" are actually one framework's opinion.
 
 ---
 
-## 0. โมเดลความคิดหลัก — Progressive Disclosure 3 ระดับ **[ทางการ]**
+## 0. The core mental model — 3-level Progressive Disclosure **[Official]**
 
-เข้าใจเรื่องนี้เรื่องเดียว เทคนิคที่เหลือจะตามมาเอง SKILL.md ทำงานเป็น 3 ชั้น แต่ละชั้นโหลดเข้า context คนละจังหวะ:
+Understand this one thing and the rest of the techniques follow. A SKILL.md works in 3 layers, each loaded into context at a different moment:
 
-| ระดับ | สิ่งที่อยู่ | โหลดเมื่อไหร่ | ต้นทุน token |
+| Level | What's in it | Loaded when | Token cost |
 |---|---|---|---|
-| 1 | `name` + `description` (frontmatter) | โหลดเข้า system prompt **ตลอดเวลา** | เล็กมาก — ต้องประหยัดสุด |
-| 2 | เนื้อ SKILL.md (body) | โหลด**เฉพาะตอนที่ skill ถูก trigger** | ปานกลาง — คุม <500 บรรทัด |
-| 3 | ไฟล์แนบ (`references/`, `scripts/`, `assets/`) | โหลด**เมื่อถูกเรียกใช้จริงเท่านั้น** | ศูนย์ จนกว่าจะเปิด |
+| 1 | `name` + `description` (frontmatter) | loaded into the system prompt **always** | tiny — must be most frugal |
+| 2 | the SKILL.md body | loaded **only when the skill is triggered** | medium — keep < 500 lines |
+| 3 | attached files (`references/`, `scripts/`, `assets/`) | loaded **only when actually used** | zero until opened |
 
-**นัยที่ตามมา:** `description` คือป้ายชี้ทาง ไม่ใช่คู่มือ · body คือสารบัญ ไม่ใช่สารานุกรม · รายละเอียดหนัก ๆ ผลักลง reference ได้ฟรี ("SKILL.md serves as an overview that points Claude to detailed materials as needed, like a table of contents")
+**Implications:** the `description` is a signpost, not a manual · the body is a table of contents, not an encyclopedia · heavy detail can be pushed down into a reference for free ("SKILL.md serves as an overview that points Claude to detailed materials as needed, like a table of contents")
 
 ---
 
-## 1. `description` — สนามรบที่สำคัญที่สุด (และขัดแย้งที่สุด)
+## 1. `description` — the most important (and most contested) battleground
 
-`description` คือสัญญาณเดียวที่ Claude ใช้เลือก skill จาก 100+ ตัว เขียนพลาดตรงนี้ = skill ดีแค่ไหนก็ไม่เคยถูกเรียก
+The `description` is the only signal Claude uses to pick a skill out of 100+. Get it wrong = no matter how good the skill, it's never invoked.
 
-### สิ่งที่ทุกแหล่ง**เห็นตรงกัน**
-1. **เขียนเป็นบุรุษที่ 3 เสมอ** **[ทางการ]** — เพราะ description ถูกฉีดเข้า system prompt · ห้าม "I can help you..." (บุรุษที่ 1 ทำให้ discovery พัง)
-2. **ใส่ trigger keywords ที่ผู้ใช้พูดจริง** **[ทางการ]** — อาการ, ข้อความ error, คำพ้อง, ชื่อเครื่องมือเฉพาะ · "เจาะจง" ชนะ "กว้าง ๆ" เสมอ — `Helps with documents` / `Processes data` คือโหมดเจ๊งแบบเงียบอันดับ 1
-3. **อธิบาย "ปัญหา" ไม่ใช่ "อาการเฉพาะภาษา"** **[ชุมชน]** — เขียน "race conditions, timing-dependent" ไม่ใช่ "setTimeout, sleep" (เว้นแต่ skill นั้นผูกกับเทคโนโลยีเฉพาะ)
-4. **อยู่ใต้ลิมิต 1024 ตัวอักษร** **[ทางการ]** · ของที่โหลดบ่อยควรเล็ง ~ต่ำกว่า 500 ตัวอักษร **[ชุมชน]**
-5. **ทำให้ "ดันนิด ๆ" (pushy)** **[ทางการ-ish]** — Claude มักจะ *under-trigger* skill โดยปริยาย skill-creator ทางการบอกให้ "make the skill descriptions a little bit pushy"
-6. **แยก skill ที่ซ้อนทับกัน** ด้วยขอบเขตที่ไม่ทับกัน + ประโยค "Do not use when…"
+### What every source **agrees on**
+1. **Always write in the third person** **[Official]** — because the description is injected into the system prompt · no "I can help you..." (first person breaks discovery)
+2. **Include the trigger keywords the user actually says** **[Official]** — symptoms, error text, synonyms, specific tool names · "specific" beats "broad" every time — `Helps with documents` / `Processes data` is the #1 silent failure mode
+3. **Describe the "problem", not the "language-specific symptom"** **[Community]** — write "race conditions, timing-dependent" not "setTimeout, sleep" (unless the skill is tied to a specific technology)
+4. **Stay under the 1024-character limit** **[Official]** · frequently-loaded ones should aim for ~under 500 characters **[Community]**
+5. **Make it "a little pushy"** **[Official-ish]** — Claude tends to *under-trigger* skills by default; the official skill-creator says to "make the skill descriptions a little bit pushy"
+6. **Separate overlapping skills** with non-overlapping boundaries + a "Do not use when…" sentence
 
-### จุดขัดแย้งที่ต้องรู้ — "บอกว่าทำอะไร" หรือ "บอกแค่ตอนไหน"?
-นี่คือจุดที่ verify phase ชี้ชัดที่สุด มี 2 สำนักที่ขัดกันตรง ๆ:
+### The conflict you must know — "say what it does" or "say only when"?
+This is where the verify phase was sharpest. Two schools conflict head-on:
 
-- **สำนัก Anthropic ทางการ:** description ต้องมี **ทั้ง "ทำอะไร" และ "ใช้ตอนไหน"**
+- **The official Anthropic school:** the description must have **both "what it does" and "when to use it"**
   > *"The description field enables Skill discovery and should include both what the Skill does and when to use it"*
-  ตัวอย่างทางการ: `Extract text and tables from PDF files, fill forms, merge documents. Use when working with PDF files or when the user mentions PDFs, forms, or document extraction.`
+  Official example: `Extract text and tables from PDF files, fill forms, merge documents. Use when working with PDF files or when the user mentions PDFs, forms, or document extraction.`
 
-- **สำนัก superpowers:** description ต้อง **"บอกแค่ตอนไหน" (triggers only) ห้ามสรุป workflow**
-  > เพราะการทดสอบพบว่า ถ้า description สรุป workflow → Claude ทำตาม description แล้ว**ข้ามการอ่าน body** · มีเคสจริง: description บอก "code review between tasks" ทำให้ Claude รีวิว **1 ครั้ง** ทั้งที่ flowchart ใน body สั่ง **2 ครั้ง** — พอลบคำสรุป workflow ออก ก็หายเป็นปกติ
+- **The superpowers school:** the description must **"say only when" (triggers only), never summarize the workflow**
+  > because testing found that if the description summarizes the workflow → Claude follows the description and **skips reading the body** · real case: a description saying "code review between tasks" made Claude review **once** when the flowchart in the body mandated **twice** — removing the workflow summary fixed it.
 
-**คำตัดสินจาก verify (verdict: nuanced):** กฎ "triggers only, ห้ามบอกว่าทำอะไรเลย" คือ **การตีเกินจริง** — มันขัดกับเอกสารทางการ Anthropic โดยตรง · **แก่นที่ถูกต้องคือ: อย่าให้ description สรุป "ลำดับขั้น workflow"** (นั่นทำให้ Claude ลัดขั้นตอน) แต่ "บอกว่าทำอะไร + ใช้ตอนไหน" นั้นทำได้และควรทำ
+**Verdict from verify (nuanced):** the rule "triggers only, never say what it does" is an **overreach** — it directly contradicts the official Anthropic docs · **the valid kernel is: don't let the description summarize the "workflow's step sequence"** (that makes Claude shortcut the steps), but "say what it does + when to use it" is allowed and recommended.
 
-> **สูตรปฏิบัติที่ปลอดภัย:** `<ทำอะไร 1 ประโยค> + Use when <เงื่อนไข/อาการ/คำที่ผู้ใช้พูด>` — แต่**ห้ามใส่ลำดับขั้นตอน** ("ขั้น 1 ทำ A แล้วขั้น 2 ทำ B") ลงใน description โดยเฉพาะ skill ที่เป็น workflow หลายสเต็ป
-
----
-
-## 2. โครงสร้าง body + สไตล์เนื้อหา
-
-### โครงสร้าง
-- **ไฟล์เดียว (SKILL.md อย่างเดียว) เป็นโครงสร้างที่ถูกต้องและพบบ่อย** **[ทางการ]** — ไม่ต้องแตกไฟล์ถ้าไม่จำเป็น
-- **body ต่ำกว่า 500 บรรทัด ถ้าใกล้ลิมิตให้แตกไฟล์** **[ทางการ]**
-- **reference ลึกแค่ 1 ระดับจาก SKILL.md เท่านั้น** **[ทางการ]** — ห้าม SKILL→advanced→details เพราะ Claude อ่านแบบ partial (`head -100`) ไฟล์ที่ซ้อนลึกจะถูกอ่านไม่ครบ
-- **ไฟล์ reference ที่ยาวเกิน 100 บรรทัด ใส่สารบัญ (TOC) ไว้บนสุด** **[ทางการ]** — กันกรณี Claude preview แบบอ่านบางส่วน
-- **แตก reference ตาม "โดเมน/ตัวแปร" ไม่ใช่ตามเลขลำดับ** — `forms.md`, `tables.md` ไม่ใช่ `doc1.md`, `doc2.md` · ให้ context ที่ไม่เกี่ยวกันแยกกันอยู่
-
-### สไตล์เนื้อหา
-- **กระชับสุด ๆ — "context window คือสมบัติสาธารณะ"** **[ทางการ]** · ตั้งสมมติฐานว่า "Claude ฉลาดอยู่แล้ว" · ถามทุกย่อหน้าว่า *"ย่อหน้านี้คุ้มค่า token ที่กินไหม?"* (ตัวอย่างทางการ: เขียน PDF instruction แบบ ~50 token ชนะแบบ ~150 token ที่อธิบายว่า PDF คืออะไร)
-- **อธิบาย "ทำไม" แทนการตะโกน MUST/ALWAYS/NEVER ล้วน ๆ** — เหตุผลทำให้ Claude ทำตามได้ทั่วถึงกว่าคำสั่งเปล่า (*มีจุดตึง*: skill วินัยบางตัวจงใจใช้ MUST เพื่อปิดช่องแถ — เลือกตามประเภท skill ดูข้อ 4)
-- **ใช้ภาษาสั่งการ (imperative) + คำศัพท์สม่ำเสมอตลอดทั้ง skill** — อย่าสลับเรียกสิ่งเดียวกันหลายชื่อ
-- **ตัวอย่างที่ดี 1 อันชนะหลายภาษาเจือจาง** — ยกตัวอย่างภาษาเดียวให้ลึก ดีกว่ายก 5 ภาษาแบบผิว ๆ
-- **skill คือ "เอกสารอ้างอิงที่ใช้ซ้ำได้" ไม่ใช่ "เรื่องเล่าการแก้ปัญหาครั้งหนึ่ง"** — ตัด narrative เฉพาะเคสออก
-- **เลี่ยงข้อมูลที่ผูกกับเวลา** (เวอร์ชัน/วันที่) — ถ้าจำเป็นให้ทำหัวข้อ "old patterns" แยก
-- **flowchart ใช้เฉพาะจุดตัดสินใจที่ไม่ชัดเจน** — อย่าวาด flowchart สำหรับขั้นตอนเชิงเส้น โค้ด หรือเนื้อหา reference
-- **ให้ "ค่าตั้งต้น 1 อย่าง ไม่ใช่เมนูตัวเลือก"** — ตัวเลือกเยอะ = instruction ไม่ determinstic
-
-### Degrees of freedom — ปรับความเข้มงวดตามความเปราะของงาน **[ทางการ]**
-- งานเปราะ/ผิดแล้วพัง (สะพานแคบ) → เขียนเป็นขั้นตอนตายตัว สคริปต์สำเร็จรูป
-- งานยืดหยุ่น (สนามโล่ง) → ให้หลักการ ปล่อยให้ Claude เลือกวิธี
-- จับคู่ระดับอิสระให้ตรงกับงาน อย่าให้สคริปต์ตายตัวกับงานสร้างสรรค์ หรือปล่อยอิสระกับงานที่ห้ามพลาด
+> **Safe practical formula:** `<what it does, 1 sentence> + Use when <condition/symptom/words the user says>` — but **don't put a step sequence** ("step 1 do A, then step 2 do B") into the description, especially for a multi-step workflow skill.
 
 ---
 
-## 3. ไฟล์แนบ (Bundled Resources) **[ทางการ]**
+## 2. Body structure + content style
 
-โครงไดเรกทอรีมาตรฐาน: `scripts/` · `references/` · `assets/`
+### Structure
+- **A single file (SKILL.md only) is a valid and common structure** **[Official]** — don't split files unless you must
+- **Body under 500 lines; if near the limit, split into files** **[Official]**
+- **References go only 1 level deep from SKILL.md** **[Official]** — no SKILL→advanced→details, because Claude reads partially (`head -100`); deeply nested files get read incompletely
+- **A reference file over 100 lines gets a table of contents (TOC) at the top** **[Official]** — guards against Claude previewing only part of it
+- **Split references by "domain/variable", not by sequence number** — `forms.md`, `tables.md` not `doc1.md`, `doc2.md` · keep unrelated context separate
 
-- **มัด utility script ไว้สำหรับงาน deterministic/ทำซ้ำ** — แทนที่จะอธิบายเป็นร้อยแก้วให้ Claude reinvent ทุกครั้ง ให้แนบสคริปต์ที่รันได้เลย (ถ้าเทสต์รันเดิมซ้ำ ๆ = สัญญาณว่าควรเป็นสคริปต์)
-- **ระบุเจตนา "ให้รัน" vs "ให้อ่าน" ให้ชัด** — บอกชัดว่าไฟล์ไหน execute ไฟล์ไหนอ่านประกอบ
-- **สคริปต์ต้อง "แก้ปัญหา" ไม่ใช่ "โยนกลับ"** — มี error handling จริง ห้าม voodoo/magic constant ที่อธิบายไม่ได้ ห้าม path แบบ Windows hardcode
-- **ใช้ forward slash เสมอ + ชื่อไฟล์สื่อความหมาย + ชื่อ MCP tool แบบเต็ม (fully-qualified)** — ช่วย navigation และพกข้ามแพลตฟอร์มได้
-- **อย่าสมมติว่า package ติดตั้งแล้ว** — runtime/แพ็กเกจต่างกันตามแพลตฟอร์ม
+### Content style
+- **As concise as possible — "the context window is a public good"** **[Official]** · assume "Claude is already smart" · ask of every paragraph *"is this paragraph worth the tokens it costs?"* (official example: a ~50-token PDF instruction beats a ~150-token one that explains what a PDF is)
+- **Explain "why" instead of shouting bare MUST/ALWAYS/NEVER** — reasons make Claude comply more consistently than naked commands (*there's tension here*: some discipline skills deliberately use MUST to close loopholes — choose by skill type, see §4)
+- **Use imperative language + consistent terminology throughout the skill** — don't call the same thing by several names
+- **One good example beats several diluted languages** — go deep on one language rather than skim 5
+- **A skill is a "reusable reference document", not "the story of one problem-solving session"** — cut case-specific narrative
+- **Avoid time-bound info** (versions/dates) — if necessary, make a separate "old patterns" section
+- **Use a flowchart only for genuinely unclear decision points** — don't draw a flowchart for linear steps, code, or reference content
+- **Give "one default, not a menu of options"** — many options = a non-deterministic instruction
 
----
-
-## 4. Skill ประเภทยาก — Discipline & Orchestrator
-
-skill 2 ประเภทนี้ต้องการเทคนิคพิเศษ เพราะ Claude มีแรงจูงใจจะ "แถ" ออกจากกระบวนการ
-
-### Discipline skills (บังคับวินัย เช่น TDD, debugging) **[ชุมชน — superpowers]**
-- **ปิดทุกช่องโหว่อย่างชัดเจน — อย่าแค่ระบุกฎ** เพราะ Claude จะหาเหตุผลแถ
-- **ตาราง Rationalization (`ข้ออ้าง | ความจริง`)** — ดักข้ออ้างที่เจอจากการเทสต์จริง เขียนคู่กับคำโต้แบบ verbatim
-- **รายการ Red Flags ให้ Claude เช็คตัวเอง** — "ถ้าคุณกำลังคิดประโยคพวกนี้ = หยุด คุณกำลังแถ"
-- **วางหลักการรากตั้งแต่ต้น: "ละเมิดตัวอักษรของกฎ = ละเมิดเจตนาของกฎ"** **[verify: confirmed ว่าได้ผลจริง]** — ตัดข้ออ้างประเภท "ผมทำตามเจตนาแล้ว" ทั้งตระกูล (มีหลักฐาน meta-test: เพิ่มประโยคนี้แล้ว agent เปลี่ยนพฤติกรรมเป็น "ทำตามกฎ")
-- **อัปเดต description ด้วย "อาการตอนละเมิด"** — CSO สำหรับ skill วินัย เพื่อให้มัน trigger ตอนที่ Claude กำลังจะทำผิด
-
-### Orchestrator skills (ร้อย skill อื่นเป็น workflow) **[ชุมชน — creating-workflow-skills]**
-- **ใช้คำไปกับ "ราว" ที่ agent มักพลาด ไม่ใช่ happy path** — pre-flight, ขอบเขต loop, การส่งต่อ artifact, การกู้คืนเมื่อ gate ไม่ผ่าน
-- **description ต้องบอก "สถานการณ์" ไม่ใช่ "ลำดับ chain"** — (สอดคล้องกับข้อ 1: อย่าสรุป workflow ลง description)
-- **กฎ body ของ orchestrator:** เรียกทุกสเต็ปผ่าน Skill tool จริง · ลำดับตายตัว · ย้อนกลับได้แต่ห้ามกระโดดข้ามไปข้างหน้า · ห้ามเคลมเสร็จก่อน gate สุดท้ายผ่าน · เดินสเต็ปอัตโนมัติไม่ถามว่า "ทำต่อไหม"
-- **Nested orchestration: อย่าขับ sub-skill ซ้ำ** — ถ้า skill ลูกขับ phase ภายในของมันเอง ให้ gate ที่ "หลักฐานว่าเสร็จ" (build/test ผ่าน) ไม่ใช่คำรายงานตัวเอง
-- **อย่าสอนซ้ำสิ่งที่ skill รากฐานที่อ้างถึงสอนไว้แล้ว**
-
-> *(หมายเหตุ: skill `start-work` ที่คุณสร้างไว้ในเซสชันก่อน ใช้เทคนิคชุดนี้ครบ — รายละเอียดใน [[skill-collection-workspace]])*
+### Degrees of freedom — tune strictness to the task's fragility **[Official]**
+- fragile work / breaks if wrong (a narrow bridge) → write fixed steps, ready-made scripts
+- flexible work (an open field) → give principles, let Claude choose the method
+- match the degree of freedom to the task; don't put a rigid script on creative work, or free rein on work that must not fail
 
 ---
 
-## 5. Eval & Testing — หัวใจที่คนมองข้าม
+## 3. Bundled Resources **[Official]**
 
-### Eval-driven development **[ทางการ]** — verify: confirmed
-- **สร้าง evaluation ก่อนเขียนเอกสารยาว ๆ** — *"Create evaluations BEFORE writing extensive documentation... solves real problems rather than documenting imagined ones"*
-- ลำดับ 5 ขั้นทางการ: ระบุช่องว่าง → สร้าง 3 สถานการณ์ทดสอบ → วัด baseline (ไม่มี skill) → ใส่ instruction ขั้นต่ำ → วนปรับ
-- schema eval ทางการ: `{skills, query, files, expected_behavior}` · checklist ทางการสั่ง "สร้างอย่างน้อย 3 evaluation"
+Standard directory layout: `scripts/` · `references/` · `assets/`
 
-### Subagent pressure-testing **[ชุมชน — superpowers]** — verify: nuanced
-- **เทสต์ด้วย subagent แบบ A/B (มี skill vs ไม่มี)** บนงานจริง ไม่ใช่ quiz
-- *"เทสต์ที่ดีรวมแรงกดดัน 3+ อย่าง"* (เวลาจำกัด + อำนาจสั่ง + ความเหนื่อย ฯลฯ) — **แต่ verify เตือน: เลข "3+" เป็น heuristic ของผู้เขียน ไม่ใช่ค่าที่ Anthropic ยืนยันเชิงประจักษ์**
-- **Meta-testing: ถาม agent ที่ล้มเหลวว่า "skill ควรเขียนยังไงถึงจะกันพลาดนี้ได้"** แล้ว map คำตอบ: ไม่ชัด→เสริมหลักการ / "ควรบอก X"→เพิ่มแบบ verbatim / "ไม่เห็น Y"→ทำให้เด่นขึ้น
-
-### วัดผลเชิงปริมาณ **[ทางการ — skill-creator]**
-- **วัด trigger accuracy บนเคส should-trigger / should-NOT-trigger** แล้ววน optimize description
-- **variance analysis: รันหลายรอบ** (เช่น 3 ครั้งต่อ query) เพื่อจับ flaky / non-discriminating / tradeoff pattern
-- **เทสต์กับทุกโมเดลที่จะใช้จริง** (Haiku/Sonnet/Opus) — พฤติกรรมต่างกัน
-- **สังเกตว่า Claude เดินผ่าน skill ยังไงในงานจริง** แล้ววนปรับ (Claude A เขียน / Claude B ทดสอบ)
-
-### The Iron Law **[ชุมชน — superpowers]** — verify: nuanced
-> *"NO SKILL WITHOUT A FAILING TEST FIRST"* — ใช้กับ skill ใหม่และการแก้ skill เดิม
-- **verify เตือน:** เป็น house style ที่เข้มของ framework เดียว ไม่ใช่หลักทางการ · Anthropic แนะแบบอ่อนกว่า ("เริ่มจาก evaluation สังเกตจุดที่สะดุด แล้ววน") · และ "test" ในที่นี้คือ subagent pressure scenario ไม่ใช่ unit test อัตโนมัติ · เป็นหลักการที่ดี แต่กรอบ "ลบทิ้ง/เริ่มใหม่" เป็นสไตล์เฉพาะที่ขึ้นกับบริบท
+- **Bundle a utility script for deterministic/repeated work** — instead of describing it in prose for Claude to reinvent each time, attach a runnable script (if a test re-runs the same thing repeatedly = a signal it should be a script)
+- **State the intent "to run" vs "to read" clearly** — say which file to execute and which to read for reference
+- **Scripts must "solve the problem", not "throw it back"** — real error handling, no voodoo/magic constants you can't explain, no hardcoded Windows paths
+- **Always use forward slashes + meaningful file names + fully-qualified MCP tool names** — helps navigation and cross-platform portability
+- **Don't assume a package is installed** — runtimes/packages differ by platform
 
 ---
 
-## 6. Anti-patterns — เช็กลิสต์ "อย่าทำ"
+## 4. The hard skill types — Discipline & Orchestrator
 
-| Anti-pattern | ทำไมพัง |
+These two types need special technique, because Claude is motivated to "weasel" out of the process.
+
+### Discipline skills (enforce a discipline, e.g. TDD, debugging) **[Community — superpowers]**
+- **Close every loophole explicitly — don't just state the rule** because Claude will rationalize its way out
+- **A Rationalization table (`Excuse | Reality`)** — catch the excuses seen in real testing, written next to a verbatim rebuttal
+- **A Red Flags list for Claude to self-check** — "if you're thinking these sentences = STOP, you're rationalizing"
+- **Lay the root principle up front: "violating the letter of the rule = violating the intent of the rule"** **[verify: confirmed effective]** — kills the whole "but I followed the intent" family of excuses (meta-test evidence: adding this sentence changed agent behavior to "follow the rule")
+- **Update the description with the "symptoms of violating"** — CSO for a discipline skill, so it triggers right when Claude is about to do it wrong
+
+### Orchestrator skills (chain other skills into a workflow) **[Community — creating-workflow-skills]**
+- **Spend your words on the "rails" agents reliably miss, not the happy path** — pre-flight, loop bounds, artifact hand-off, recovery when a gate isn't met
+- **The description must state the "situation", not the "chain sequence"** — (consistent with §1: don't summarize the workflow in the description)
+- **Orchestrator body rules:** invoke every step through the real Skill tool · fixed order · backward jumps allowed but never forward jumps · no early completion claim before the final gate passes · auto-progress through steps without asking "continue?"
+- **Nested orchestration: don't re-drive a sub-skill** — if the child skill drives its own internal phases, gate on "evidence it finished" (build/test passing) not its self-report
+- **Don't re-teach what a referenced foundation skill already teaches**
+
+> *(Note: the `start-work` skill in this pack uses this full set of techniques.)*
+
+---
+
+## 5. Eval & Testing — the overlooked heart
+
+### Eval-driven development **[Official]** — verify: confirmed
+- **Build the evaluation before writing extensive documentation** — *"Create evaluations BEFORE writing extensive documentation... solves real problems rather than documenting imagined ones"*
+- The official 5-step order: identify the gap → build 3 test scenarios → measure a baseline (no skill) → add minimal instructions → iterate
+- Official eval schema: `{skills, query, files, expected_behavior}` · the official checklist says "create at least 3 evaluations"
+
+### Subagent pressure-testing **[Community — superpowers]** — verify: nuanced
+- **Test with subagents A/B (with skill vs without)** on real work, not a quiz
+- *"A good test combines 3+ pressures"* (time limit + authority + exhaustion etc.) — **but verify cautions: the "3+" number is the author's heuristic, not a value Anthropic confirmed empirically**
+- **Meta-testing: ask a failed agent "how should the skill be written to prevent this mistake"** then map the answer: vague → reinforce the principle / "should say X" → add it verbatim / "didn't see Y" → make it more prominent
+
+### Quantitative measurement **[Official — skill-creator]**
+- **Measure trigger accuracy on should-trigger / should-NOT-trigger cases** then iterate on the description
+- **Variance analysis: run multiple times** (e.g. 3 per query) to catch flaky / non-discriminating / tradeoff patterns
+- **Test on every model you'll actually use** (Haiku/Sonnet/Opus) — behavior differs
+- **Observe how Claude walks through the skill on real work** then iterate (Claude A writes / Claude B tests)
+
+### The Iron Law **[Community — superpowers]** — verify: nuanced
+> *"NO SKILL WITHOUT A FAILING TEST FIRST"* — applies to new skills and to editing existing skills
+- **verify cautions:** this is one framework's strict house style, not an official principle · Anthropic recommends something softer ("start from an evaluation, observe where it stumbles, iterate") · and "test" here means a subagent pressure scenario, not an automated unit test · it's a good principle, but the "delete/restart" framing is a context-dependent style choice
+
+---
+
+## 6. Anti-patterns — a "don't" checklist
+
+| Anti-pattern | Why it fails |
 |---|---|
-| description กว้าง/คลุมเครือ (`Helps with X`) | โหมดเจ๊งเงียบอันดับ 1 — ไม่เคย trigger |
-| description สรุปลำดับ workflow | Claude ทำตาม description แล้วข้ามอ่าน body (ลัดขั้นตอน) |
-| body อืด เกิน ~500 บรรทัด | กิน token เปล่า — ผลักลง reference |
-| ใส่รายละเอียดระดับ reference ใน body | ทำลาย progressive disclosure |
-| reference ซ้อนลึกหลายชั้น | Claude อ่าน partial → พลาดเนื้อหา (ลึกได้แค่ 1 ระดับ) |
-| instruction ไม่ deterministic / ตัวเลือกเยอะ | ผลลัพธ์เดาไม่ได้ — ให้ค่าตั้งต้น 1 อย่าง |
-| skill ทับซ้อนกันหลายตัว | แย่งกัน trigger ผิดตัว — ใส่ "Do not use when" |
-| MUST/ALWAYS/NEVER ล้วนไม่มีเหตุผล | ทำตามไม่ทั่วถึง — อธิบาย why (ยกเว้น skill วินัยที่จงใจปิดช่องแถ) |
-| ตัวอย่างเป็น narrative เฉพาะเคส / หลายภาษาเจือจาง | skill ต้องใช้ซ้ำได้ ไม่ใช่บันทึกการแก้ครั้งเดียว |
-| สคริปต์โยน error กลับ / magic number / Windows path | ไม่ deterministic + พกข้ามเครื่องไม่ได้ |
-| ข้อมูลผูกเวลา (เวอร์ชัน/วันที่) ใน body | ล้าสมัยเงียบ ๆ |
-| ติดตั้ง skill เยอะเกิน / ปล่อยอิสระเกิน | แย่ง context + trigger มั่ว |
+| broad/vague description (`Helps with X`) | the #1 silent failure mode — never triggers |
+| description summarizes the workflow sequence | Claude follows the description and skips the body (shortcuts the steps) |
+| bloated body over ~500 lines | wastes tokens — push down into a reference |
+| reference-level detail in the body | breaks progressive disclosure |
+| references nested several levels deep | Claude reads partially → misses content (only 1 level deep) |
+| non-deterministic instruction / many options | unpredictable result — give one default |
+| many overlapping skills | fight over triggering the wrong one — add "Do not use when" |
+| bare MUST/ALWAYS/NEVER with no reasons | inconsistent compliance — explain why (except discipline skills deliberately closing loopholes) |
+| examples as case narrative / many diluted languages | a skill must be reusable, not a record of one fix |
+| script throws the error back / magic numbers / Windows paths | non-deterministic + not cross-machine portable |
+| time-bound info (versions/dates) in the body | silently goes stale |
+| too many skills installed / too much free rein | competes for context + triggers wrongly |
 
-**เมื่อไหร่ที่ไม่ควรสร้าง skill:** ถ้าเป็นกฎพฤติกรรมอัตโนมัติ ("ทุกครั้งที่...") → ใช้ hook · ถ้าเป็นค่า setting → ใช้ config · skill เหมาะกับ "ความรู้/กระบวนการที่ Claude ดึงมาใช้ตอนทำงาน"
+**When NOT to build a skill:** if it's an automatic behavior rule ("every time that...") → use a hook · if it's a setting value → use config · a skill fits "knowledge/process that Claude pulls in while working"
 
 ---
 
-## 7. ตารางสรุป — "ทางการ Anthropic" vs "ธรรมเนียมชุมชน"
+## 7. Summary table — "Official Anthropic" vs "Community convention"
 
-นี่คือผลสำคัญที่สุดจาก verify phase — แยกให้ชัดว่าอะไรอ้างอิงได้แน่ vs อะไรเป็นความเห็น framework
+This is the most important result from the verify phase — separating what's firmly citable vs what's one framework's opinion.
 
-| เทคนิค | สถานะ | หมายเหตุจาก verify |
+| Technique | Status | Note from verify |
 |---|---|---|
-| description มี "ทำอะไร + ใช้ตอนไหน" | **ทางการ** ✅ | ยืนยันตรงเอกสาร best-practices |
-| description "triggers only ห้ามบอกว่าทำอะไร" | ชุมชน ⚠️ | ตีเกินจริง — แก่นจริงคือ "อย่าสรุป workflow" |
-| Progressive disclosure / SKILL.md เป็นสารบัญ | **ทางการ** ✅ | ตรงเอกสาร |
-| body <500 บรรทัด | **ทางการ** ✅ | นับเป็น "บรรทัด" |
-| word budget <150/<200/<500 คำ | ชุมชน ⚠️ | Anthropic นับบรรทัดไม่ใช่คำ ไม่มี tiering นี้ |
-| reference ลึก 1 ระดับ | **ทางการ** ✅ | ตรงเอกสาร |
-| TOC สำหรับไฟล์ >100 บรรทัด | **ทางการ** ✅ | (skill-creator ใช้ >300 — เลขไม่ตรงกันเองบ้าง) |
-| "context window คือสมบัติสาธารณะ" | **ทางการ** ✅ | quote ตรง |
-| สร้าง eval ก่อนเขียน doc | **ทางการ** ✅ | quote ตรง |
-| CSO / keyword coverage | ทางการ-บางส่วน ⚠️ | เน้นที่ field description เป็นหลัก ไม่ใช่ heading/body |
-| Iron Law (failing test first) | ชุมชน ⚠️ | house style เข้ม ไม่ใช่หลักทางการ |
-| pressure-test "3+ แรงกดดัน" | ชุมชน ⚠️ | เลข 3+ เป็น heuristic ไม่ verified |
-| "spirit vs letter" หลักการราก | ชุมชน ✅ | n=1 แต่มีหลักฐานว่าได้ผลจริง |
-| persuasion principles ตามประเภท skill | ชุมชน ⚠️ | กลไกโอเค แต่ framing เชิงสถิติเกินหลักฐาน |
+| description has "what it does + when to use" | **Official** ✅ | confirmed straight from the best-practices doc |
+| description "triggers only, never say what it does" | Community ⚠️ | overreach — the real kernel is "don't summarize the workflow" |
+| Progressive disclosure / SKILL.md as a TOC | **Official** ✅ | matches the doc |
+| body <500 lines | **Official** ✅ | counts "lines" |
+| word budget <150/<200/<500 words | Community ⚠️ | Anthropic counts lines not words; no such tiering |
+| references 1 level deep | **Official** ✅ | matches the doc |
+| TOC for files >100 lines | **Official** ✅ | (skill-creator uses >300 — the numbers don't fully agree) |
+| "the context window is a public good" | **Official** ✅ | direct quote |
+| build the eval before writing docs | **Official** ✅ | direct quote |
+| CSO / keyword coverage | partly Official ⚠️ | focused on the description field, not headings/body |
+| Iron Law (failing test first) | Community ⚠️ | strict house style, not an official principle |
+| pressure-test "3+ pressures" | Community ⚠️ | the 3+ number is a heuristic, not verified |
+| "spirit vs letter" root principle | Community ✅ | n=1 but with evidence it works |
+| persuasion principles by skill type | Community ⚠️ | the mechanism is fine, but the statistical framing exceeds the evidence |
 
 ---
 
-## 8. เทมเพลตเริ่มต้น + Pre-flight checklist
+## 8. Starter template + Pre-flight checklist
 
-### frontmatter (กฎ validation)
+### frontmatter (validation rules)
 ```yaml
 ---
-name: my-skill-name        # ≤64 ตัวอักษร, lowercase+ตัวเลข+hyphen เท่านั้น, ห้ามคำสงวน
-description: <ทำอะไร 1 ประโยค>. Use when <เงื่อนไข/อาการ/คำที่ผู้ใช้พูด>.  # ≤1024 ตัวอักษร, บุรุษที่ 3
-# --- ส่วนขยายเฉพาะ Claude Code (ออปชัน) ---
+name: my-skill-name        # ≤64 chars, lowercase + digits + hyphen only, no reserved words
+description: <what it does, 1 sentence>. Use when <condition/symptom/words the user says>.  # ≤1024 chars, third person
+# --- Claude Code-specific extensions (optional) ---
 # allowed-tools: Read, Grep, Bash
 # model: claude-opus-4-8
 # disable-model-invocation: false
 ---
 ```
-> **2 field ที่บังคับ:** `name` + `description` เท่านั้น · ที่เหลือ optional
+> **Only 2 required fields:** `name` + `description` · the rest are optional
 
-### โครงร่าง body มาตรฐาน
+### Standard body skeleton
 ```markdown
-# <ชื่อ skill>
-<1-2 ประโยคบอกว่าทำอะไร>
+# <skill name>
+<1-2 sentences on what it does>
 
 ## When to use / When NOT to use
-## <ขั้นตอน/หลักการหลัก>   ← imperative, กระชับ, ตัวอย่างเดียวลึก ๆ
-## Red Flags (ถ้าเป็น skill วินัย)
-## Rationalizations table (ถ้าเป็น skill วินัย)
+## <main steps / principles>   ← imperative, concise, one deep example
+## Red Flags (if a discipline skill)
+## Rationalizations table (if a discipline skill)
 
-# ไฟล์แนบ (โหลดเมื่อต้องการ):
-# references/<โดเมน>.md   ← รายละเอียดหนัก, มี TOC ถ้า >100 บรรทัด
-# scripts/<งานซ้ำ>.py     ← งาน deterministic
+# Attached files (loaded on demand):
+# references/<domain>.md   ← heavy detail, TOC if >100 lines
+# scripts/<repeated task>.py  ← deterministic work
 ```
 
-### Pre-flight checklist ก่อน deploy
-- [ ] `description` มี "ทำอะไร + Use when" + คำ trigger ที่ผู้ใช้พูดจริง (ไม่สรุป workflow)
-- [ ] บุรุษที่ 3, ≤1024 ตัวอักษร
-- [ ] body <500 บรรทัด, รายละเอียดหนักผลักลง reference
-- [ ] reference ลึกแค่ 1 ระดับ, ไฟล์ >100 บรรทัดมี TOC
-- [ ] สร้าง eval/baseline แล้ว (อย่างน้อย 3 สถานการณ์) — มี skill ดีกว่าไม่มีจริงไหม
-- [ ] (skill วินัย) ปิดช่องแถด้วย rationalization table + red flags + หลักการ "letter=spirit"
-- [ ] เทสต์ trigger บนเคส should/should-NOT + เทสต์ข้ามโมเดลที่จะใช้
-- [ ] forward slash, ไม่มี time-sensitive info, คำศัพท์สม่ำเสมอ
+### Pre-flight checklist before deploy
+- [ ] `description` has "what it does + Use when" + the trigger words the user actually says (no workflow summary)
+- [ ] third person, ≤1024 chars
+- [ ] body <500 lines, heavy detail pushed into references
+- [ ] references only 1 level deep, files >100 lines have a TOC
+- [ ] eval/baseline built (at least 3 scenarios) — is having the skill actually better than not?
+- [ ] (discipline skill) loopholes closed with a rationalization table + red flags + the "letter=spirit" principle
+- [ ] trigger tested on should/should-NOT cases + tested across the models you'll use
+- [ ] forward slashes, no time-sensitive info, consistent terminology
 
 ---
 
-## แหล่งอ้างอิงหลัก
-- **Anthropic ทางการ:** `platform.claude.com/docs/en/agents-and-tools/agent-skills/` (overview + best-practices) · `anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills` · repo `anthropics/skills` (skill-creator)
-- **ชุมชน:** `github.com/obra/superpowers` (writing-skills, testing-skills-with-subagents) · mattpocock:write-a-skill · creating-workflow-skills (ในเครื่อง)
-- **งานวิจัยอ้างอิงเรื่อง persuasion:** Meincke, Cialdini et al. "Call Me a Jerk" (Wharton/PNAS, 2026) — *ระวัง: วัดบน jailbreak request ไม่ใช่ instruction-following ทั่วไป*
+## Primary sources
+- **Official Anthropic:** `platform.claude.com/docs/en/agents-and-tools/agent-skills/` (overview + best-practices) · `anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills` · the `anthropics/skills` repo (skill-creator)
+- **Community:** `github.com/obra/superpowers` (writing-skills, testing-skills-with-subagents) · mattpocock:write-a-skill · creating-workflow-skills (local)
+- **Persuasion research cited:** Meincke, Cialdini et al. "Call Me a Jerk" (Wharton/PNAS, 2026) — *caution: measured on jailbreak requests, not general instruction-following*
 
-*ข้อมูล verify ณ 2026-06-15 — เอกสารทางการ Anthropic อัปเดตได้ ตรวจ URL ก่อนอ้างเป็นมาตรฐาน*
+*Verified as of 2026-06-15 — the official Anthropic docs can change; check the URLs before citing as a standard*
