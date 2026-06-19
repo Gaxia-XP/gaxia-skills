@@ -1,0 +1,11 @@
+{
+  "plugins": [
+    {
+      "name": "gaxia-skills",
+      "description": "A skill-builder's toolkit: author, ship, and validate Claude Code workflow skills.",
+      "version": "0.1.0",
+      "source": ".",
+      "repository": "https://github.com/Gaxia-XP/gaxia-skills"
+    }
+  ]
+}
