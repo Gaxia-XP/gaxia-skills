@@ -7,69 +7,69 @@ description: Use when the user wants to benchmark, test, score, evaluate, or mea
 
 You orchestrate a 6-phase benchmark of a TARGET skill. Drive each phase by invoking the named subagent or script yourself. The output is a `scorecard.md` + `tuning-report.md` backed by real evidence — never a static opinion.
 
-## Rules (rails — อ่านก่อนเริ่ม)
-1. **ห้ามให้คะแนนโดยไม่รัน scenario จริง.** การวิจารณ์ skill จากการอ่าน SKILL.md เฉย ๆ คือการละเมิด ไม่ใช่ทางลัด — สิ่งที่ skill นี้วัด (การไหลของ workflow + การตัดสินใจ + ทนแรงกดดัน) มองไม่เห็นจาก static review
-2. **ทุก score ต้องมีหลักฐาน** อ้าง quote จริงจาก transcript/Decision Log — score ที่ "รู้สึก" เป็นโมฆะ
-3. **รัน baseline (with/without skill) เสมอ** เว้นผู้ใช้สั่งปิด — ไม่มี baseline = ไม่รู้ว่า skill สร้าง delta จริงไหม
-4. **ผู้ใช้ต้อง approve scenarios.json ก่อน Phase 2** — scenario อ่อน = วัดอะไรไม่ออก
-5. **Pressure changes depth, not steps** — ใช้กับทั้งตัวเรา (อย่าลัดเฟส) และเป็นเกณฑ์ตัดสิน robustness ของ skill เป้าหมาย
+## Rules (rails — read before you start)
+1. **Never score without running a real scenario.** Reviewing a skill by just reading its SKILL.md is a violation, not a shortcut — what this skill measures (workflow flow + decision-making + holding up under pressure) is invisible to a static review.
+2. **Every score needs evidence** — quote it from the real transcript / Decision Log. A score based on a "feeling" is void.
+3. **Always run the baseline (with/without the skill)** unless the user turns it off — no baseline = no way to know whether the skill creates a real delta.
+4. **The user must approve scenarios.json before Phase 2** — weak scenarios measure nothing.
+5. **Pressure changes depth, not steps** — this applies to us (don't shortcut a phase) AND it is the criterion for judging the target skill's robustness.
 
 ## The 6 Phases
 
-### Phase 0 — Profile: สกัด Skill Contract
-อ่าน SKILL.md เป้าหมาย (+ references/agents ของมัน) → สกัด **Skill Contract** (ดู `references/scenario-design.md` หัวข้อ "Skill Contract คืออะไร"): ลำดับสเต็ป, จุดแยก+เกณฑ์, gate/exit, sub-skill ที่ต้องเรียก **(เช็คว่ามีจริงใน available skills — ถ้าอ้าง skill ที่ไม่มี = banner เป็นบั๊กใน Contract)**, rails/red-flags, output คาดหวัง, เงื่อนไข trigger.
-**Exit:** มี Contract ครบ 7 ข้อ. ถ้าไม่มีลำดับสเต็ป/จุดแยก → เปิด **fallback** (ดู rubric) แล้วแจ้งผู้ใช้
+### Phase 0 — Profile: extract the Skill Contract
+Read the target SKILL.md (+ its references/agents) → extract the **Skill Contract** (see `references/scenario-design.md`, section "What is a Skill Contract"): step order, branch points + criteria, gates/exits, sub-skills it must invoke **(verify they actually exist in the available skills — referencing a skill that doesn't exist is a bug in the Contract)**, rails/red-flags, expected output, trigger conditions.
+**Exit:** the Contract has all 7 items. If there is no step order / no branch point → switch to **fallback** (see rubric) and tell the user.
 
-### Phase 1 — Scenario: สร้างสถานการณ์
-ตาม `references/scenario-design.md` + `references/pressure-taxonomy.md`: neutral 3-5, adversarial 3-5 (เจาะ rail แต่ละตัว), trigger 8-10 (should/should-not). เขียน `scenarios.json`.
-**Exit:** ผู้ใช้ approve scenarios.json
+### Phase 1 — Scenario: build the situations
+Per `references/scenario-design.md` + `references/pressure-taxonomy.md`: neutral 3-5, adversarial 3-5 (each one probing a specific rail), trigger 8-10 (should / should-not). Write `scenarios.json`.
+**Exit:** the user approves scenarios.json
 
 ### Phase 2 — Run: spawn runner subagents
-ต่อ scenario spawn **runner** (ตาม `agents/runner.md`) — รัน skill เป้าหมายจริง + บันทึก Decision Log. รัน **with_skill และ baseline** และ **×3 ต่อ config** เพื่อวัด variance. เก็บ transcript + decision-log.md + efficiency (tokens/duration จาก task notification) ลง `<target>-benchmark/iteration-N/<scenario_id>/<config>/run-<index>/`.
-**Exit:** ทุก run มี decision-log.md + transcript
+Per scenario, spawn a **runner** (per `agents/runner.md`) — run the target skill for real + record a Decision Log. Run **with_skill and baseline**, and **×3 per config** to measure variance. Save transcript + decision-log.md + efficiency (tokens/duration from the task notification) under `<target>-benchmark/iteration-N/<scenario_id>/<config>/run-<index>/`.
+**Exit:** every run has a decision-log.md + transcript
 
 ### Phase 3 — Judge: spawn judge subagents
-ต่อ run spawn **judge** (ตาม `agents/judge.md`) อ่าน rubric + Contract + Decision Log + **transcript จริง** → เขียน `grading.json`. มิติที่เถียงได้ (workflow_adherence/decision_quality/robustness) spawn **judge 3 ตัว → median**. trigger records ตัดสิน correct = (should_fire==fired).
-**Exit:** ทุก run มี grading.json ตาม schema
+Per run, spawn a **judge** (per `agents/judge.md`) to read the rubric + Contract + Decision Log + **the real transcript** → write `grading.json`. For the contestable dimensions (workflow_adherence/decision_quality/robustness), spawn **3 judges → median**. Trigger records are scored correct = (should_fire == fired).
+**Exit:** every run has a grading.json matching the schema
 
-### Phase 4 — Aggregate: รวมเป็น scorecard
-รัน (cwd = scripts dir):
+### Phase 4 — Aggregate: roll up into a scorecard
+Run (cwd = scripts dir):
 ```bash
 python aggregate_scorecard.py <iteration_dir> --skill-name <target-name>
 ```
-ได้ `scorecard.json` + `scorecard.md`: mean±stddev ต่อมิติ, overall+grade, delta with/without, flags (high_variance/non_discriminating).
-**Exit:** scorecard.md สร้างแล้ว
+Produces `scorecard.json` + `scorecard.md`: mean±stddev per dimension, overall + grade, with/without delta, flags (high_variance / non_discriminating).
+**Exit:** scorecard.md created
 
-### Phase 5 — Tune: รายงานแนวทางปรับ
-ตาม `agents/tuning-advisor.md`: map คะแนนต่ำ/flag/จุดพัง → คำสั่งแก้รูปธรรม อ้างเทคนิคจาก `references/skill-authoring-techniques.md` → `tuning-report.md` เรียงตามความสำคัญ.
-**Exit:** tuning-report.md ทุกข้อผูกหลักฐานจริง
+### Phase 5 — Tune: report how to improve
+Per `agents/tuning-advisor.md`: map low scores / flags / failure points → concrete fix instructions, citing techniques from `references/skill-authoring-techniques.md` → `tuning-report.md`, ordered by priority.
+**Exit:** every item in tuning-report.md is tied to real evidence
 
 ## Scale & rate-limit robustness (Phase 2-3 fan-out)
-Phase 2-3 spawn subagent จำนวนมาก (runner+judge รวมอาจ 100+). บทเรียนจริง: fan-out พร้อมกันที่ concurrency cap (~16) ทำให้ server ตอบ "Server is temporarily limiting requests (not your usage limit)" แล้ว **starve ตัวท้าย batch** — ล้มได้ ~ครึ่ง. recipe:
-1. **Chunk fan-out:** ถ้า runner+judge รวม >50 อย่า parallel ทีเดียว — `await parallel()` ทีละ slice ~6 (บังคับ concurrency ≤6 + เว้นจังหวะระหว่าง chunk). หลักฐาน: chunk-6 ผ่าน 46/46 หลัง cap-16 ล้ม ~50%.
-2. **Decouple runner (แพง, รอดแล้วเก็บไว้) จาก judge (ถูก, เติมใหม่ได้)** — อย่า re-run ทั้ง matrix เพื่อแก้ partial fail; runner เป็นส่วนที่แพงและไม่ควรทิ้ง.
-3. **Recovery แบบ idempotent:** คำนวณ gap (run ไหนขาด grading-j ไหน / trigger ไหนยังไม่มี) แล้ว spawn เฉพาะรู; ให้ agent self-skip ถ้าไฟล์ปลายทางมีอยู่แล้ว → re-run ได้เรื่อย ๆ จน gap ปิด.
-4. ถ้าใช้ Workflow tool: **bake พารามิเตอร์ลงตัว script ตรง ๆ** — `args` อาจไม่ถึง script (เคยเจอ script เห็น `{}` แล้วรัน default เต็ม).
+Phases 2-3 spawn many subagents (runner + judge combined can be 100+). Real lesson: fanning out all at once at the concurrency cap (~16) makes the server respond "Server is temporarily limiting requests (not your usage limit)" and then **starve the tail of the batch** — roughly half can fail. Recipe:
+1. **Chunk the fan-out:** if runner + judge total > 50, don't parallelize them all at once — `await parallel()` one slice of ~6 at a time (forces concurrency ≤6 + spaces the chunks out). Evidence: chunk-6 passed 46/46 after cap-16 failed ~50%.
+2. **Decouple the runner (expensive; once it survives, keep it) from the judge (cheap; can be refilled)** — don't re-run the whole matrix to fix a partial failure; the runner is the expensive part and should not be thrown away.
+3. **Idempotent recovery:** compute the gap (which run is missing which grading-j / which trigger has none yet) and spawn only the holes; have each agent self-skip if the destination file already exists → you can re-run repeatedly until the gap closes.
+4. If you use the Workflow tool: **bake the parameters straight into the script** — `args` may not reach the script (seen: the script saw `{}` and ran the full default).
 
 ## Fallback (reference / style skill)
-ถ้า Phase 0 พบว่า skill เป้าหมายไม่มี workflow/จุดแยกชัด → ตัด workflow_adherence + decision_quality + robustness (applicable=false) เหลือ **triggering + output_quality** (ดู `references/rubric.md` หัวข้อ fallback). อย่าฝืนวัด workflow ที่ skill ไม่มี
+If Phase 0 finds the target skill has no workflow / no clear branch points → drop workflow_adherence + decision_quality + robustness (applicable=false) and keep **triggering + output_quality** (see `references/rubric.md`, fallback section). Don't force-measure a workflow the skill doesn't have.
 
-## Rationalizations — สังเกตจาก baseline จริง ทั้งหมดผิด
-| ข้ออ้าง | ความจริง |
+## Rationalizations — observed in real baselines, all wrong
+| Excuse | Reality |
 |---|---|
-| "อ่าน SKILL.md ก็ประเมินได้ ไม่ต้องรัน" | static review ไม่เห็นการไหล/การตัดสินใจจริง — นั่นคือสิ่งที่ skill นี้วัด ต้องรัน scenario |
-| "ให้คะแนนจากความรู้สึกพอ" | score ไม่มีหลักฐาน = โมฆะ — judge บังคับ quote |
-| "baseline ไม่จำเป็น" | ไม่มี baseline = ไม่รู้ว่า skill สร้าง delta จริงไหม (อาจได้ผลเท่า agent เปล่า) |
-| "scenario เดียว/รอบเดียวพอ" | variance สูง — รันหลายรอบ + หลาย branch ถึงเชื่อได้ |
-| "ข้าม adversarial ก็ได้ skill ดูดีแล้ว" | robustness คือจุดที่ workflow skill พังเงียบ — ห้ามข้าม |
-| "Decision Log บอกว่าทำครบ เชื่อได้" | runner อาจเขียน log สวยกว่าจริง — judge ต้องเทียบ transcript |
+| "Reading the SKILL.md is enough to assess it, no need to run" | A static review doesn't see the real flow / decisions — that's exactly what this skill measures. Run the scenario. |
+| "Scoring from a feeling is fine" | A score with no evidence is void — the judge is forced to quote. |
+| "The baseline isn't necessary" | No baseline = no way to know the skill creates a real delta (it might do no better than a bare agent). |
+| "One scenario / one run is enough" | Variance is high — run multiple times + multiple branches before you trust it. |
+| "Skipping adversarial is fine, the skill already looks good" | Robustness is exactly where a workflow skill fails silently — never skip it. |
+| "The Decision Log says it did everything, that's trustworthy" | The runner may write a prettier log than reality — the judge must compare against the transcript. |
 
-## Red Flags — STOP แล้วกลับมาอ่าน skill นี้
-- กำลังจะให้คะแนนแต่ยังไม่ได้ spawn runner / ยังไม่มี transcript
-- score ไหนไม่มี evidence
-- ข้าม adversarial หรือข้าม baseline โดยผู้ใช้ไม่ได้สั่ง
-- เชื่อ Decision Log โดยไม่เทียบ transcript
-- กำลังวัด workflow ของ skill ที่ไม่มี workflow (ควร fallback)
+## Red Flags — STOP and re-read this skill
+- About to score but haven't spawned a runner yet / there's no transcript
+- A score with no evidence
+- Skipping adversarial or skipping the baseline without the user asking
+- Trusting the Decision Log without comparing the transcript
+- Measuring the workflow of a skill that has no workflow (should fall back)
 
 ## Completion
-จบเมื่อมี **scorecard.md + tuning-report.md** พร้อมหลักฐาน. สรุปให้ผู้ใช้: เกรดรวม with/without + delta, จุดเด่น/จุดพันที่มีหลักฐาน, คำแนะนำ P1 พร้อมข้อเสนอวน re-benchmark
+Done when there is a **scorecard.md + tuning-report.md** backed by evidence. Summarize for the user: overall grade with/without + delta, strengths / failure points with evidence, the P1 recommendation plus a re-benchmark loop proposal.
