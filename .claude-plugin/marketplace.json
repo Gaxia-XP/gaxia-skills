@@ -1,4 +1,10 @@
 {
+  "name": "gaxia-skills",
+  "owner": { "name": "Gaxia-XP" },
+  "metadata": {
+    "description": "A skill-builder's toolkit: author, ship, and validate Claude Code workflow skills.",
+    "version": "0.1.0"
+  },
   "plugins": [
     {
       "name": "gaxia-skills",

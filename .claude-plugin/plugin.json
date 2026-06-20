@@ -2,5 +2,10 @@
   "name": "gaxia-skills",
   "description": "A skill-builder's toolkit: author orchestrator skills (creating-workflow-skills), route any work through the right workflow (start-work), and benchmark skills with real evidence (benchmarking-skills).",
   "version": "0.1.0",
-  "author": { "name": "Gaxia-XP" }
+  "author": { "name": "Gaxia-XP" },
+  "skills": [
+    "./skills/start-work",
+    "./skills/benchmarking-skills",
+    "./skills/creating-workflow-skills"
+  ]
 }
