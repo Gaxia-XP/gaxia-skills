@@ -3,13 +3,13 @@
   "owner": { "name": "Gaxia-XP" },
   "metadata": {
     "description": "A skill-builder's toolkit: author, ship, and validate Claude Code workflow skills.",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "plugins": [
     {
       "name": "gaxia-skills",
       "description": "A skill-builder's toolkit: author, ship, and validate Claude Code workflow skills.",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "source": ".",
       "repository": "https://github.com/Gaxia-XP/gaxia-skills"
     }

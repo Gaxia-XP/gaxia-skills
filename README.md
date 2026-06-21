@@ -1,6 +1,6 @@
 # gaxia-skills
 
-A skill-builder's toolkit for Claude Code: **author → ship → validate** your own workflow skills — plus an on-demand tutor to learn anything.
+A skill-builder's toolkit for Claude Code: **author → ship → validate** your own workflow skills — plus an on-demand tutor to learn anything and a token-economy mode to work cheaply.
 
 | Skill | What it does |
 |---|---|
@@ -8,6 +8,7 @@ A skill-builder's toolkit for Claude Code: **author → ship → validate** your
 | `start-work` | A workflow router: clarify the goal, pick one route (feature / bug / mechanical / unclear), then drive each sub-skill in order. |
 | `benchmarking-skills` | A 6-phase benchmark that scores a skill on real runs (with/without baseline) and emits a scorecard + tuning report. |
 | `lemme-teach-you` | An on-demand tutor: clarifies what you want to learn, verifies the facts, sequences a lesson, then teaches it in the delivery style you pick. |
+| `dont-burn-my-tokens` | A token-economy mode: delegate heavy work to cheap subagents, keep the main context lean, and stay concise — without dropping quality. |
 
 ## Install
 
@@ -16,7 +17,7 @@ A skill-builder's toolkit for Claude Code: **author → ship → validate** your
 /plugin install gaxia-skills@gaxia-skills
 ```
 
-Then invoke: `gaxia-skills:start-work`, `gaxia-skills:benchmarking-skills`, `gaxia-skills:creating-workflow-skills`, `gaxia-skills:lemme-teach-you`.
+Then invoke: `gaxia-skills:start-work`, `gaxia-skills:benchmarking-skills`, `gaxia-skills:creating-workflow-skills`, `gaxia-skills:lemme-teach-you`, `gaxia-skills:dont-burn-my-tokens`.
 
 ## Prerequisites
 
@@ -46,6 +47,7 @@ This toolkit stands on the shoulders of these packs — thank you:
 - **benchmarking-skills** — point it at a target `SKILL.md`; it profiles the skill, generates scenarios (you approve them), runs with/without baseline, judges with evidence, and reports a grade + tuning advice.
 - **creating-workflow-skills** — read it before authoring any orchestrator skill; it gives the rails template and the common mistakes to avoid.
 - **lemme-teach-you** — say "teach me X" / "สอน X หน่อย"; it pins scope + depth, verifies the material, shows a lesson outline, lets you pick a delivery style, then teaches and recaps with encouragement. Standalone (no prerequisite packs).
+- **dont-burn-my-tokens** — say "low token mode" / "ประหยัด token"; a persistent mode that delegates heavy work to cheap subagents (haiku/sonnet), keeps the main context lean, and stays concise. Off with "normal mode". Standalone; stack with `caveman` for max output compression.
 
 ## License
 

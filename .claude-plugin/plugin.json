@@ -1,12 +1,13 @@
 {
   "name": "gaxia-skills",
-  "description": "A skill-builder's toolkit plus an on-demand tutor: author orchestrator skills (creating-workflow-skills), route any work through the right workflow (start-work), benchmark skills with real evidence (benchmarking-skills), and learn any topic on demand (lemme-teach-you).",
-  "version": "0.2.0",
+  "description": "A skill-builder's toolkit plus an on-demand tutor and a token-economy mode: author orchestrator skills (creating-workflow-skills), route any work through the right workflow (start-work), benchmark skills with real evidence (benchmarking-skills), learn any topic on demand (lemme-teach-you), and work cheaply by delegating to subagents (dont-burn-my-tokens).",
+  "version": "0.3.0",
   "author": { "name": "Gaxia-XP" },
   "skills": [
     "./skills/start-work",
     "./skills/benchmarking-skills",
     "./skills/creating-workflow-skills",
-    "./skills/lemme-teach-you"
+    "./skills/lemme-teach-you",
+    "./skills/dont-burn-my-tokens"
   ]
 }
