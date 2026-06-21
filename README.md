@@ -1,12 +1,13 @@
 # gaxia-skills
 
-A skill-builder's toolkit for Claude Code: **author → ship → validate** your own workflow skills.
+A skill-builder's toolkit for Claude Code: **author → ship → validate** your own workflow skills — plus an on-demand tutor to learn anything.
 
 | Skill | What it does |
 |---|---|
 | `creating-workflow-skills` | How to author an orchestrator skill — the robustness rails agents reliably miss. |
 | `start-work` | A workflow router: clarify the goal, pick one route (feature / bug / mechanical / unclear), then drive each sub-skill in order. |
 | `benchmarking-skills` | A 6-phase benchmark that scores a skill on real runs (with/without baseline) and emits a scorecard + tuning report. |
+| `lemme-teach-you` | An on-demand tutor: clarifies what you want to learn, verifies the facts, sequences a lesson, then teaches it in the delivery style you pick. |
 
 ## Install
 
@@ -15,7 +16,7 @@ A skill-builder's toolkit for Claude Code: **author → ship → validate** your
 /plugin install gaxia-skills@gaxia-skills
 ```
 
-Then invoke: `gaxia-skills:start-work`, `gaxia-skills:benchmarking-skills`, `gaxia-skills:creating-workflow-skills`.
+Then invoke: `gaxia-skills:start-work`, `gaxia-skills:benchmarking-skills`, `gaxia-skills:creating-workflow-skills`, `gaxia-skills:lemme-teach-you`.
 
 ## Prerequisites
 
@@ -44,6 +45,7 @@ This toolkit stands on the shoulders of these packs — thank you:
 - **start-work** — say what you want done; it asks one batched clarifying question, announces a route, and drives the chain.
 - **benchmarking-skills** — point it at a target `SKILL.md`; it profiles the skill, generates scenarios (you approve them), runs with/without baseline, judges with evidence, and reports a grade + tuning advice.
 - **creating-workflow-skills** — read it before authoring any orchestrator skill; it gives the rails template and the common mistakes to avoid.
+- **lemme-teach-you** — say "teach me X" / "สอน X หน่อย"; it pins scope + depth, verifies the material, shows a lesson outline, lets you pick a delivery style, then teaches and recaps with encouragement. Standalone (no prerequisite packs).
 
 ## License
 
