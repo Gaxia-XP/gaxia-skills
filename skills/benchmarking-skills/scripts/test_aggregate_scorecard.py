@@ -145,6 +145,18 @@ def test_render_no_trigger_shows_na():
         shutil.rmtree(tmp)
 
 
+def test_render_includes_scope_note():
+    # lean/scoped runs must stamp provenance so a partial scorecard isn't mistaken for a full one.
+    tmp = Path(tempfile.mkdtemp())
+    try:
+        _make_iteration(tmp)
+        report = agg.aggregate(tmp)
+        md = agg.render_markdown(report, skill_name="x", scope_note="lean; types=[trigger]; with_skill only")
+        assert "lean; types=[trigger]; with_skill only" in md
+    finally:
+        shutil.rmtree(tmp)
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     failed = 0

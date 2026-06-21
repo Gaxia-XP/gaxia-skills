@@ -125,8 +125,11 @@ def aggregate(iteration_dir):
             "record_count": len(records)}
 
 
-def render_markdown(report, skill_name):
+def render_markdown(report, skill_name, scope_note=""):
     lines = [f"# Benchmark Scorecard — {skill_name}", ""]
+    if scope_note:
+        lines.append(f"_Scope: {scope_note}_")
+        lines.append("")
     for cfg, rep in sorted(report["configs"].items()):
         lines.append(f"## Config: {cfg}")
         lines.append(f"**Overall: {rep['overall_score']} ({rep['grade']})**")
@@ -163,12 +166,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("iteration_dir")
     ap.add_argument("--skill-name", required=True)
+    ap.add_argument("--scope-note", default="")
     args = ap.parse_args()
     report = aggregate(args.iteration_dir)
     out_dir = Path(args.iteration_dir)
     (out_dir / "scorecard.json").write_text(
         json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
-    md = render_markdown(report, args.skill_name)
+    md = render_markdown(report, args.skill_name, scope_note=args.scope_note)
     (out_dir / "scorecard.md").write_text(md, encoding="utf-8")
     print(f"Wrote {out_dir / 'scorecard.json'} and {out_dir / 'scorecard.md'}")
     print(f"Aggregated {report['record_count']} records")
