@@ -10,9 +10,9 @@ You orchestrate a 6-phase benchmark of a TARGET skill. Drive each phase by invok
 ## Rules (rails — read before you start)
 1. **Never score without running a real scenario.** Reviewing a skill by just reading its SKILL.md is a violation, not a shortcut — what this skill measures (workflow flow + decision-making + holding up under pressure) is invisible to a static review.
 2. **Every score needs evidence** — quote it from the real transcript / Decision Log. A score based on a "feeling" is void.
-3. **Always run the baseline (with/without the skill)** unless the user turns it off — no baseline = no way to know whether the skill creates a real delta.
+3. **Run the baseline (with/without the skill) by default** unless the user turns it off or scope drops it (e.g. a skill-only re-check) — no baseline = no way to know whether the skill creates a real delta. When re-tuning against a known prior baseline, reuse it.
 4. **The user must approve scenarios.json before Phase 2** — weak scenarios measure nothing.
-5. **Pressure changes depth, not steps** — this applies to us (don't shortcut a phase) AND it is the criterion for judging the target skill's robustness.
+5. **Pressure changes depth, not steps** — this applies to us (don't shortcut a phase) AND it is the criterion for judging the target skill's robustness. Cost works the same way: lean reduces *evidence depth* (fewer judges/runs) but never *steps* (still run real scenarios + baseline + median on adversarial).
 
 ## Scope & Rigor (read first — sets the cost)
 Start every run by parsing a **scope spec** from the user's request (default = a lean full run):
@@ -85,7 +85,7 @@ If Phase 0 finds the target skill has no workflow / no clear branch points → d
 | "Reading the SKILL.md is enough to assess it, no need to run" | A static review doesn't see the real flow / decisions — that's exactly what this skill measures. Run the scenario. |
 | "Scoring from a feeling is fine" | A score with no evidence is void — the judge is forced to quote. |
 | "The baseline isn't necessary" | No baseline = no way to know the skill creates a real delta (it might do no better than a bare agent). |
-| "One scenario / one run is enough" | Variance is high — run multiple times + multiple branches before you trust it. |
+| "One scenario / one run is enough" | **Explore (lean):** ×1 run is fine. **Gate / publishing a result (rigorous):** ≥2 runs + median, or variance can fool you — pick by whether you're exploring or gating. |
 | "Skipping adversarial is fine, the skill already looks good" | Robustness is exactly where a workflow skill fails silently — never skip it. |
 | "The Decision Log says it did everything, that's trustworthy" | The runner may write a prettier log than reality — the judge must compare against the transcript. |
 
