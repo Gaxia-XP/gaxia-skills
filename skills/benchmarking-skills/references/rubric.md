@@ -15,6 +15,8 @@
 ## Overview
 Score 0-5 per `applicable` dimension (even anchors = 5/3/1/0; odd scores = between anchors). The `dimension keys` are fixed: `triggering`, `workflow_adherence`, `decision_quality`, `robustness`, `output_quality`. Efficiency is an indicator, not converted to a grade.
 
+> **Lean vs rigorous:** lean mode scores the *same dimensions* with fewer judges/runs (1 judge on neutral, ×1 run) — a cost/provenance choice, not a change to the scoring method. The median is still used on adversarial.
+
 ---
 
 ## 1. triggering

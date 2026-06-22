@@ -14,6 +14,31 @@ You orchestrate a 6-phase benchmark of a TARGET skill. Drive each phase by invok
 4. **The user must approve scenarios.json before Phase 2** — weak scenarios measure nothing.
 5. **Pressure changes depth, not steps** — this applies to us (don't shortcut a phase) AND it is the criterion for judging the target skill's robustness.
 
+## Scope & Rigor (read first — sets the cost)
+Start every run by parsing a **scope spec** from the user's request (default = a lean full run):
+- `skills` — the target SKILL.md(s) to benchmark
+- `scenario_types` — neutral | adversarial | trigger (default: all). "triggers only" = no runners at all
+- `scenario_ids` — all in the chosen types, or an explicit subset (e.g. re-run only adversarial-2, -4)
+- `configs` — with_skill + baseline (default both; a re-check may be with_skill only)
+- `phases` — 0 Profile · 1 Scenario · 2 Run · 3 Judge · 4 Aggregate · 5 Tune (default all; a subset enables reuse)
+- `rigor` — lean (default) | rigorous
+
+**Principle: scope narrows the work, reuse fills the rest** — phases/units not in scope reuse existing artifacts (idempotent self-skip). E.g. "re-judge only" → skip Phase 2, reuse the existing transcripts; "re-aggregate" → run the script only. Phase 0/1 reuse the existing Contract + scenarios.json if present.
+
+**Tuning re-bench loop (the highest-value case):** after applying a fix → `{scenario_ids:[the weak ones], configs:[with_skill], reuse the prior baseline}` → ~5–10 agents to confirm the fix moved the score (vs 260 for a full run).
+
+### Lean default (low cost, still trustworthy)
+| knob | lean (default) | rigorous |
+|---|---|---|
+| judges/run | 1 (neutral) / 3-median (adversarial) | 3-median every run |
+| runs/config | ×1 | ×2–3 |
+| baseline | on (delta is the core signal) | on |
+| judge model | sonnet | opus |
+| trigger runs | ×1 | ×2 |
+
+Switch to **rigorous** when the user says "rigorous" / "เข้มหน่อย" / "--rigorous", or when gating a real release.
+> Keep the median only for adversarial, because robustness/decision are the dimensions judges disagree on most; neutral/output scores are straightforward and stable with 1 judge — this cuts redundancy, not signal (the baseline is still there).
+
 ## The 6 Phases
 
 ### Phase 0 — Profile: extract the Skill Contract
