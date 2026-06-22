@@ -76,6 +76,8 @@ Phases 2-3 spawn many subagents (runner + judge combined can be 100+). Real less
 3. **Idempotent recovery:** compute the gap (which run is missing which grading-j / which trigger has none yet) and spawn only the holes; have each agent self-skip if the destination file already exists → you can re-run repeatedly until the gap closes.
 4. If you use the Workflow tool: **bake the parameters straight into the script** — `args` may not reach the script (seen: the script saw `{}` and ran the full default).
 
+> A scoped/lean Workflow shape (build the unit lists from the scope spec + chunk≤6 + idempotent self-skip): see `references/workflow-recipe.md`
+
 ## Fallback (reference / style skill)
 If Phase 0 finds the target skill has no workflow / no clear branch points → drop workflow_adherence + decision_quality + robustness (applicable=false) and keep **triggering + output_quality** (see `references/rubric.md`, fallback section). Don't force-measure a workflow the skill doesn't have.
 
