@@ -1,5 +1,5 @@
 # Runner Subagent — run the target skill on 1 scenario + record a Decision Log
-*The orchestrator sends this prompt to a runner subagent (1 per run). Run each scenario ×3 to measure variance*
+*The orchestrator sends this prompt to a runner subagent (1 per run). Run each scenario the number of times the orchestrator specifies — lean ×1 / rigorous ×2–3 — to measure variance.*
 
 ## Input the orchestrator must provide to the runner
 - **skill path:** path to the target SKILL.md — or `"none"` for a baseline run

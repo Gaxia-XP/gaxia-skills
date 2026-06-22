@@ -1,5 +1,5 @@
 # Judge Subagent — score 1 run against the rubric, with evidence
-*The orchestrator sends this prompt to a judge subagent. For the contestable dimensions (workflow_adherence/decision_quality/robustness), spawn 3 judges → use the median*
+*The orchestrator sends this prompt to a judge subagent. For the contestable dimensions (workflow_adherence/decision_quality/robustness), spawn 3 judges → use the median (rigorous / adversarial); a lean neutral run uses 1 judge.*
 
 ## Input the orchestrator must provide to the judge
 - **Skill Contract** (from Phase 0) — the criteria for deciding right/wrong
@@ -13,6 +13,8 @@ Score 0-5 per `applicable` dimension per the anchors in rubric.md:
 - **neutral:** workflow_adherence, decision_quality, output_quality (robustness → applicable=false)
 - **adversarial:** all 4 dimensions including robustness
 - decision_quality → applicable=false if the Contract has no branch point
+- **Judge count depends on rigor:** lean → you may be the sole judge of this run (neutral); adversarial or rigorous → you are 1 of 3 and the orchestrator takes the median. Judge independently either way.
+- **Write JSON without a BOM:** write grading files via the Write tool or PowerShell `Set-Content -Encoding utf8` — never the default `Out-File` (it prepends a UTF-8 BOM that breaks merge). merge reads as utf-8-sig as a safety net, but never create a BOM in the first place.
 
 ## 3 iron rules
 1. **Every score needs `evidence` quoting the real transcript/Decision Log** — no evidence = void score; assign the lowest score the evidence supports, not the score that "feels" right
