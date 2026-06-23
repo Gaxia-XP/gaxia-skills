@@ -26,9 +26,9 @@ Then invoke: `gaxia-skills:start-work`, `gaxia-skills:benchmarking-skills`, `gax
 | Pack | Provides | Source |
 |---|---|---|
 | superpowers | brainstorming, writing-plans, executing-plans, writing-skills | github.com/obra/superpowers |
-| 9arm-skills | debug-mantra, scrutinize, post-mortem | its public repo |
-| mattpocock-skills | grill-with-docs, grill-me, diagnose, prototype, handoff | its public repo |
-| feature-dev | feature-dev | @claude-plugins-official |
+| 9arm-skills | debug-mantra, scrutinize, post-mortem | github.com/thananon/9arm-skills |
+| mattpocock-skills | grill-with-docs, grill-me, diagnose, prototype, handoff | github.com/mattpocock/skills |
+| feature-dev | feature-dev | github.com/anthropics/claude-plugins-public (/plugins/feature-dev) |
 
 If a required skill is missing, `start-work` stops and tells you which one — it never silently does the step itself.
 
@@ -37,9 +37,9 @@ If a required skill is missing, `start-work` stops and tells you which one — i
 This toolkit stands on the shoulders of these packs — thank you:
 
 - [superpowers](https://github.com/obra/superpowers) — Jesse Vincent / obra (MIT)
-- mattpocock-skills — Matt Pocock (MIT)
-- 9arm-skills
-- feature-dev — Anthropic, `@claude-plugins-official` (Apache-2.0)
+- [mattpocock-skills](https://github.com/mattpocock/skills) — Matt Pocock (MIT)
+- [9arm-skills](https://github.com/thananon/9arm-skills) — thananon (9arm)
+- [feature-dev](https://github.com/anthropics/claude-plugins-public/tree/main/plugins/feature-dev) — Anthropic, `@claude-plugins-official` (Apache-2.0)
 
 ## Quickstart per skill
 
