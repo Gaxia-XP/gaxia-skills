@@ -46,14 +46,14 @@ For a neutral/adversarial run:
 - `score`: int 0-5 or `null` (if applicable=false) · `applicable`: bool · `evidence`: string (must not be empty if applicable=true)
 - Don't use other keys like `name`/`met`/`details` — use only `score`/`applicable`/`evidence`
 
-For a trigger scenario (the judge decides whether fired matches should_fire):
+For a trigger scenario the judge decides ONLY whether the skill would fire, and must stay BLIND to ground truth. Write **`grading-raw.json`** (NOT `grading.json`, and NOT a `grading-j*.json`) into the run dir, with TOP-LEVEL `fired` + `evidence`:
 ```json
 {
   "scenario_id": "trigger-3",
-  "scenario_type": "trigger",
-  "config": "with_skill",
-  "run_index": 0,
-  "triggering": {"should_fire": false, "fired": false, "correct": true, "evidence": "near-miss: just asking, not asking for a fix"}
+  "fired": false,
+  "evidence": "near-miss: just asking, not asking for a fix",
+  "run_index": 0
 }
 ```
-- `correct` = (`should_fire` == `fired`) · efficiency is not included in a trigger record
+- Do NOT emit `should_fire` or `correct`, and do NOT nest under a `triggering` block. `merge_gradings.py` reads the top-level `fired`/`evidence`, injects `should_fire` from scenarios.json, and computes `correct = (should_fire == fired)` into the final `grading.json`. (Writing `grading.json` or a `grading-j*.json` here makes the merge misclassify the trigger as a process run.)
+- efficiency is not included in a trigger record

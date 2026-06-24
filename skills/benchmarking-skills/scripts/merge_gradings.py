@@ -1,6 +1,11 @@
 """Merge per-judge gradings into a median grading.json per process run, and
 inject ground-truth should_fire into trigger records (judges never see should_fire).
 
+Per-run file contract: graded runs -> judges write `grading-j*.json` (1 or 3; median taken).
+Trigger runs -> the judge writes `grading-raw.json` with TOP-LEVEL {scenario_id, fired,
+evidence, run_index} and NO should_fire/correct; this script injects should_fire from
+scenarios.json and computes correct.
+
 Usage:
     python merge_gradings.py <iteration_dir> <scenarios.json>
 
