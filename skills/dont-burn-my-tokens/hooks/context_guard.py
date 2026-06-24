@@ -63,3 +63,31 @@ def build_warning(tokens, threshold=THRESHOLD):
         f"Context ~{k}k tokens -- large. Recommend /compact (keep working this "
         f"session) or hand off (pausing/ending). [dont-burn-my-tokens context guard]"
     )
+
+
+def main():
+    raw = sys.stdin.read()
+    try:
+        payload = json.loads(raw) if raw.strip() else {}
+    except ValueError:
+        payload = {}
+
+    if not marker_is_active(MARKER_PATH):
+        sys.exit(0)  # economy mode not active -> stay silent
+    transcript_path = payload.get("transcript_path")
+    if not transcript_path or not os.path.exists(transcript_path):
+        sys.exit(0)
+    try:
+        text = Path(transcript_path).read_text(encoding="utf-8", errors="ignore")
+    except OSError:
+        sys.exit(0)
+
+    warning = build_warning(compute_context_tokens(text))
+    if warning:
+        print(json.dumps({"hookSpecificOutput": {
+            "hookEventName": "Stop", "additionalContext": warning}}))
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
