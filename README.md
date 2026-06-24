@@ -7,8 +7,8 @@ A skill-builder's toolkit for Claude Code: **author → ship → validate** your
 | `creating-workflow-skills` | How to author an orchestrator skill — the robustness rails agents reliably miss. |
 | `start-work` | A workflow router: clarify the goal, pick one route (feature / bug / mechanical / unclear), then drive each sub-skill in order. |
 | `benchmarking-skills` | A 6-phase benchmark that scores a skill on real runs (with/without baseline) and emits a scorecard + tuning report. |
-| `lemme-teach-you` | An on-demand tutor: clarifies what you want to learn, verifies the facts, sequences a lesson, then teaches it in the delivery style you pick. |
-| `dont-burn-my-tokens` | A token-economy mode: delegate heavy work to cheap subagents, keep the main context lean, and stay concise — without dropping quality. |
+| `lemme-teach-you` | An on-demand tutor: picks conceptual vs hands-on mode, verifies the facts, teaches a tailored lesson, quizzes you interactively, then points you at real practice. |
+| `dont-burn-my-tokens` | A token-economy mode: delegate heavy work to cheap subagents, keep context lean, warn before context gets large (`/compact` or handoff), and stay concise. |
 
 ## Install
 
@@ -46,8 +46,8 @@ This toolkit stands on the shoulders of these packs — thank you:
 - **start-work** — say what you want done; it asks one batched clarifying question, announces a route, and drives the chain.
 - **benchmarking-skills** — point it at a target `SKILL.md`; it profiles the skill, generates scenarios (you approve them), runs with/without baseline, judges with evidence, and reports a grade + tuning advice.
 - **creating-workflow-skills** — read it before authoring any orchestrator skill; it gives the rails template and the common mistakes to avoid.
-- **lemme-teach-you** — say "teach me X" / "สอน X หน่อย"; it pins scope + depth, verifies the material, shows a lesson outline, lets you pick a delivery style, then teaches and recaps with encouragement. Standalone (no prerequisite packs).
-- **dont-burn-my-tokens** — say "low token mode" / "ประหยัด token"; a persistent mode that delegates heavy work to cheap subagents (haiku/sonnet), keeps the main context lean, and stays concise. Off with "normal mode". Standalone; stack with `caveman` for max output compression.
+- **lemme-teach-you** — say "teach me X" / "สอน X หน่อย"; it pins scope + depth, picks conceptual vs hands-on mode, verifies the material, shows a lesson outline, teaches it, then offers an interactive quiz and points you at real practice. Standalone (no prerequisite packs).
+- **dont-burn-my-tokens** — say "low token mode" / "ประหยัด token"; a persistent mode that delegates heavy work to cheap subagents (haiku/sonnet), keeps the main context lean, warns before context gets large (`/compact` or handoff), and stays concise. Off with "normal mode". Standalone; stack with `caveman` for max output compression.
 
 ## License
 
