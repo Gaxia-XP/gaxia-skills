@@ -10,6 +10,30 @@ A persistent operating mode to minimize token spend and cost while keeping quali
 ## Persistence
 ACTIVE EVERY TURN once triggered. It does not wear off after many turns. Still active if unsure. Off only when the user says "normal mode" / "stop low-token" / "off".
 
+## Context guard (offer once, then warn when context is large)
+Long sessions bloat context — the very thing that burns tokens. While economy mode is active, watch for the context getting large (~200K tokens) and tell the user to `/compact` (keep working) or hand off (pausing/ending). You cannot read your own token count, so choose a mechanism the FIRST time the mode activates.
+
+**On first activation, only if no guard hook is already installed, ask once:**
+> "ติดตั้ง hook เช็ค context อัตโนมัติไหม? แม่นกว่า (อ่าน token จริง เด้งเองทุกครั้งที่จบ turn) — หรือให้ผมประเมินเอง?"
+
+- **Yes → install the `Stop` hook** (precise): register `hooks/context_guard.py` (ships with this skill) as a `Stop` hook in **user scope** `~/.claude/settings.json` (dbmt is global). Use the `update-config` skill to edit settings.json safely:
+  ```json
+  { "hooks": { "Stop": [ { "matcher": "", "hooks": [ { "type": "command", "command": "python \"<ABS-PATH>/skills/dont-burn-my-tokens/hooks/context_guard.py\"" } ] } ] } }
+  ```
+  Then write the active-marker (below). Tune the threshold with the `DBMT_CONTEXT_THRESHOLD` env var (default 200000).
+- **No → heuristic fallback**: after each unit of work, estimate context pressure from proxy signals (cumulative large reads, long multi-task session, many tool outputs) and give the same warning when it looks ≥ ~200K. Say it is an estimate.
+- **If a guard hook is already installed**, skip the question; just manage the marker.
+- **If the user already declined this session**, don't ask again.
+
+**Active marker (gates the hook to economy mode):**
+- When economy mode turns ON, write `~/.claude/.dbmt-active` (touch it; its mtime is what the hook checks).
+- When it turns OFF ("normal mode"), delete `~/.claude/.dbmt-active`.
+- The hook warns only when this marker exists and is fresh (< 12h).
+
+**Warning content (hook or heuristic), one line:**
+`Context ~XXXk — large: /compact (keep working this session) หรือ handoff (กำลังพัก/จบงาน)`
+Recommend **handoff** (→ `mattpocock-skills:handoff`) if work is pausing/ending; **/compact** if continuing. After warning once, don't repeat every turn — re-warn only after a further jump (~+25K) or when work pauses.
+
 ## Rules
 
 ### 1. Delegate heavy work to cheap subagents (the main lever)
@@ -57,4 +81,4 @@ Do not over-compress or shortcut for: security warnings, irreversible-action con
 - About to silently use `opus` (cost) without asking.
 
 ## Off
-Deactivate when the user says "normal mode" / "stop low-token" / "off". Confirm once: "Economy mode off."
+Deactivate when the user says "normal mode" / "stop low-token" / "off". Delete the `~/.claude/.dbmt-active` marker so the context guard goes quiet. Confirm once: "Economy mode off."
