@@ -10,6 +10,7 @@ A skill-builder's toolkit for Claude Code: **author → ship → validate** your
 | `lemme-teach-you` | An on-demand tutor: picks conceptual vs hands-on mode, verifies the facts, teaches a tailored lesson, quizzes you interactively, then points you at real practice. |
 | `dont-burn-my-tokens` | A token-economy mode: delegate heavy work to cheap subagents, keep context lean, warn before context gets large (`/compact` or handoff), and stay concise. |
 | `ship-it-and-shutdown` | An unattended / overnight mode: finish the job to the given scope, merge what's safe (risky changes — migrations, secrets, deps, infra — parked as a PR, never auto-applied), write a comprehensive resume-ready report, then power the machine off. The report is the safety net, so it shuts down whether or not everything passed. |
+| `think-first` | Apply four discipline rules before any coding task to prevent common LLM mistakes: think before touching code (ask if unsure), write minimum code, touch only what was asked, and define verifiable goals. Includes a rationalization table to catch yourself before breaking the rules. |
 
 ## Install
 
@@ -18,7 +19,7 @@ A skill-builder's toolkit for Claude Code: **author → ship → validate** your
 /plugin install gaxia-skills@gaxia-skills
 ```
 
-Then invoke: `gaxia-skills:start-work`, `gaxia-skills:benchmarking-skills`, `gaxia-skills:creating-workflow-skills`, `gaxia-skills:lemme-teach-you`, `gaxia-skills:dont-burn-my-tokens`, `gaxia-skills:ship-it-and-shutdown`.
+Then invoke: `gaxia-skills:start-work`, `gaxia-skills:benchmarking-skills`, `gaxia-skills:creating-workflow-skills`, `gaxia-skills:lemme-teach-you`, `gaxia-skills:dont-burn-my-tokens`, `gaxia-skills:ship-it-and-shutdown`, `gaxia-skills:think-first`.
 
 ## Prerequisites
 
@@ -50,6 +51,7 @@ This toolkit stands on the shoulders of these packs — thank you:
 - **lemme-teach-you** — say "teach me X" / "สอน X หน่อย"; it pins scope + depth, picks conceptual vs hands-on mode, verifies the material, shows a lesson outline, teaches it, then offers an interactive quiz and points you at real practice. Standalone (no prerequisite packs).
 - **dont-burn-my-tokens** — say "low token mode" / "ประหยัด token"; a persistent mode that delegates heavy work to cheap subagents (haiku/sonnet), keeps the main context lean, warns before context gets large (`/compact` or handoff), and stays concise. Off with "normal mode". Standalone; stack with `caveman` for max output compression.
 - **ship-it-and-shutdown** — say "จะไปนอนแล้ว ฝากทำให้เสร็จ แล้วปิดคอมให้ด้วย" / "finish it overnight and shut down"; it runs the work unattended to your scope, verifies with the project's own tests/build, merges safe diffs (risky ones — migrations, secrets, deps, infra — parked as a PR, never auto-applied), writes a comprehensive `OVERNIGHT_REPORT.md` (what's done, what failed, exact next steps, recommended skills to continue), then powers the machine off — **the report is the safety net, so it shuts down pass or fail**. Standalone; can hand the doing to `start-work`.
+- **think-first** — say "คิดก่อน" / "ช้าๆ" / "ไม่ต้องรีบ" / "measure twice" / "slow down" / `/think-first`; read the four discipline rules before starting any coding task to avoid common LLM mistakes (guessing silently, over-engineering, scope creep, vague goals). Includes a rationalization table showing the exact phrases that signal you're about to break a rule. Not a workflow — read it as a filter, then apply each rule to whatever you're doing. Standalone.
 
 ## License
 
