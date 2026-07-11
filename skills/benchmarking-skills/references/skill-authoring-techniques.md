@@ -1,5 +1,7 @@
 # Techniques for writing an effective SKILL.md
-*Researched and verified 2026-06-15 — mined from the skill-authoring skills installed locally (superpowers:writing-skills, mattpocock:write-a-skill, skill-creator, creating-workflow-skills) + web research (official Anthropic docs) · 20 agents · 14 key claims verified adversarially*
+*Researched and verified 2026-06-15 — mined from skill-authoring skills installed locally plus web research and adversarial evaluation.*
+
+> **Portability note:** this file preserves Anthropic and Claude Code research as cited source material. Treat claims marked **[Official]** as official only for the cited provider. Use the portable core and host adapters for behavior that must work across agent platforms.
 
 > **The iron rule of this document:** every item is tagged **[Official]** (present in Anthropic's official docs) or **[Community]** (a convention of superpowers/obra/mattpocock — works in practice but is house style, not a standard) — because the verify phase found that many techniques people assume are "rules" are actually one framework's opinion.
 

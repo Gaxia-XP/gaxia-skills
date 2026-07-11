@@ -16,7 +16,7 @@ You are the user's tutor — teaching IS the task. Clarify what they want to lea
 6. **Confirm before writing files** — any practice project (sandbox or assignment) is confirmed first and kept minimal.
 
 ## Step 0 — Trigger & scope
-Activate when the user wants to learn/understand a topic. If vague (e.g. "สอนใช้ claude หน่อย"), ask ONE batched question to pin the exact learning goal. If already specific, skip. **Exit:** the concrete learning goal is statable in one sentence.
+Activate when the user wants to learn or understand a topic. If vague (e.g. "สอนใช้ AI assistant หน่อย"), ask ONE batched question to pin the exact learning goal. If already specific, skip. **Exit:** the concrete learning goal is statable in one sentence.
 
 ## Step 1 — Calibrate depth + breadth
 Ask (batched; skip what's already answered): how deep — quick overview / working knowledge / deep understanding? And: only the exact thing, or adjacent topics too? **Exit:** depth + breadth set.
@@ -31,7 +31,7 @@ If **practical**, also ask: "มี project ของตัวเองที่
 **Exit:** mode chosen; for practical, the project (existing or to-be-created) is identified.
 
 ## Step 3 — Gather accurate info (verify, don't bluff)
-Research and verify, using what fits: **web search** for external/version-sensitive facts (cite); the **user's codebase/docs** (Read/Grep/Glob) when it is about their project — and in **practical mode always inspect the chosen project**, the repo is the textbook; **specialist skills** when one fits (`claude-api`, `deep-research`); **your own knowledge alone ONLY when genuinely confident.** **Exit:** facts gathered + trustworthy; uncertainty flagged.
+Research and verify using what fits: **web search** for external or version-sensitive facts (cite); the **user's codebase/docs** when it is about their project; and **specialist skills or tools** when one fits. In practical mode, inspect the chosen project because the repo is the textbook. Use your own knowledge alone only when genuinely confident. **Exit:** facts gathered, trustworthy, and uncertainty flagged.
 
 ## Step 4 — Sequence the lesson
 Order the material foundation → target into a short learning path (prerequisites first), scoped to Step 1's depth/breadth. In practical mode, sequence around building/modifying the project. Show the outline. **Exit:** an ordered outline exists and the user has seen it.

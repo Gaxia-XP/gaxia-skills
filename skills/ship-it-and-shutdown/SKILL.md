@@ -1,119 +1,116 @@
 ---
 name: ship-it-and-shutdown
-description: Use when the user delegates work to run UNATTENDED and steps away — going to sleep or AFK — wanting it carried to the given scope and the machine powered off, with a thorough resume-ready report left behind for whatever didn't pass. Triggers — "จะไปนอนแล้ว ฝากทำให้เสร็จ แล้วปิดคอมให้ด้วย", "ทำให้เสร็จข้ามคืนแล้วปิดเครื่อง", "เสร็จแล้วฝากปิดคอม/ปิดเครื่องให้ด้วย", "merge เลยไม่ต้องรอรีวิว", "finish it overnight and shut down", "ship it and power off", "shut down when it's done", or /ship-it-and-shutdown.
+description: Use when the user explicitly delegates work to run unattended and explicitly authorizes a final power-down if the host can perform it safely. Complete the scoped work, verify it, park risky changes, leave a durable resume-ready report, and never claim a shutdown or external action that the host did not perform.
 ---
 
-# Ship It and Shutdown (unattended / fire-and-forget mode)
+# Ship It and Shutdown
 
-The user is gone and wants the machine OFF when they return. You carry the work to the scope they gave, integrate what's safe, then power the machine down — **whether or not everything passed.** Shutting down on an imperfect result is made safe by two things: you never auto-apply anything irreversible, and you always leave a report complete enough to resume from cold. The shutdown command is trivial; **the risk gate and the report are the skill.**
+Run an authorized unattended task to its stated scope. The durable report and risk gates are the core of this skill. Power-down is an optional terminal action, not a capability to assume.
 
-## The overriding rule
-**The run always ends in shutdown — the terminal action is the goal, not a reward for success.** It is made safe not by staying on, but by: (1) never auto-applying anything irreversible — Rail C parks it instead, so the machine is never left half-broken; and (2) always writing a durable, resume-ready report — Rail D — so a failure the user must handle is one they can pick up instantly on boot. A still-running machine is NOT the goal here; a powered-off machine plus a report that makes the next step obvious is.
+## Authorization and Host Contract
+
+Before starting, confirm all of the following from the user's request and host capabilities:
+
+1. The user explicitly authorized unattended execution.
+2. The user explicitly authorized the final power action, if they want one.
+3. The host can perform that power action safely and without bypassing confirmation or policy.
+4. The report has a durable destination the user can access later.
+
+If any item is missing, run only the authorized work, write the report, and stop. Do not turn on a machine, alter power settings, or claim a shutdown that did not occur.
 
 ## Persistence
-Active for the whole unattended run, every step, until the machine powers off. Treat the user as unreachable — never pause to ask a question they cannot answer; decide via the rails below and record every decision in the report.
 
-## The spine — each step gates the next, no skipping forward
-1. **Do the work** to the given scope (execution-agnostic). For a real coding task you may invoke **gaxia-skills:start-work** to drive the doing. This skill owns everything *after* the work claims done — don't re-drive start-work's internals, just require evidence it ran.
-2. **Verify** — Rail B. Run the project's own checks so the report can state, truthfully, what passed and what didn't.
-3. **Integrate** — Rail C. Safe diffs → merge; risky diffs → park (never auto-apply) + document.
-4. **Report — always, comprehensive** — Rail D. Written and durable off-machine.
-5. **Shutdown — always, last** — Rail A. Only after the report is safely committed.
+Treat the user as unavailable during the run. Do not pause for ordinary preference questions. Instead use the rails below, record decisions in the report, and stop when new authority is required.
 
-## Rails (keep every one)
+## The Spine
 
-### Rail A — The terminal action always happens, and always last
-Power the machine off at the end of every run — verified success or not — but ONLY after the report is written and durable (Rail D) and no irreversible change was auto-applied (Rail C). Order is absolute: nothing runs after shutdown, so the report and any push must land first. There is no "stay on" branch — a blocked or failed task is handled by the report, not by leaving the box awake. The one thing that can still stop a shutdown is a *broken precondition*: report not yet durable, or an irreversible change was applied and can't be verified safe. Fix the precondition (or park the change), then shut down.
+1. **Do the work** to the stated scope. Use `start-work` or a host-equivalent workflow when appropriate.
+2. **Verify** with the project's own checks.
+3. **Integrate safely**: merge only safe changes; park risky changes.
+4. **Write a durable report** with the exact state and next steps.
+5. **Perform the authorized power action** only after the report is durable and only if the host can do it safely.
 
-### Rail B — Definition of done is self-checkable, and the result is reported honestly
-Prove the state with the project's **own** checks — run the tests, the build, lint/typecheck. You are the only reviewer tonight. A check you didn't run is a check that didn't pass — and the report must say exactly which checks passed, which failed, and the real error output for the ones that failed. Never merge on "it looks done."
+## Rails
 
-### Rail C — Integration gate (safe → merge, risky → park, never auto-apply the irreversible)
-After verify, classify the diff:
-- **Touches nothing on the stop-list → merge** to the target branch. This is "shipping it."
-- **Touches anything on the stop-list → DO NOT auto-apply.** Push the branch + open a PR (or leave the branch in place), and document in the report what it is and why it was parked. You still shut down afterward — parking is what *keeps shutdown safe*, not a reason to stay on.
+### Rail A - Power action is explicit and last
 
-**Stop-list — if the diff matches ANY of these, do NOT auto-merge / auto-apply** (park + document):
-- **DB migrations / schema** — files under `migrations/`, any `*.sql`, or ORM migration dirs; especially `DROP`, `ALTER`, `TRUNCATE`, `DELETE`. Irreversible against real data.
-- **Secrets / credentials** — added lines matching `sk_live`, `AKIA`, `-----BEGIN * PRIVATE KEY-----`, `password=`, `token=`, high-entropy strings, or new `.env*` / `secrets*` / `credentials*` entries. Also flag the key for rotation in the report.
-- **Mass delete / move** — the diff removes or renames more than ~5 files, or drops a whole directory.
-- **Dependencies / lockfiles** — `package.json`, `*.lock`, `requirements*.txt`, `go.mod`, `Cargo.toml`, `Gemfile*`, and the like.
-- **CI / infra / deploy** — `.github/`, `Dockerfile`, `docker-compose*`, `*.tf`, k8s/helm manifests, deploy scripts.
-- **Public API / contract** — changed signatures of exported/public functions, REST/GraphQL routes, protobufs, or DB-facing schema other code depends on.
-- **Anything irreversible with an external effect** — force-push, history rewrite, data backfills/deletes, or actions that send real email / payments / messages.
+Power down only when the user requested it, the host supports it, and the report is durable. A failed task is not a reason to bypass the report. If shutdown is unavailable or requires new approval, record that fact and stop after the report.
 
-**Default-merge zone** (auto-merge when verify is green): app/business logic, bug fixes, tests, docs, comments, styling, and refactors that don't change a public signature.
+### Rail B - Definition of done is self-checkable
 
-<!-- Tune this list to your own risk tolerance — it is what keeps an unattended shutdown safe. -->
+Run the project's own relevant tests, build, lint, typecheck, or smoke checks. A check not run is not a passing check. Report actual results and relevant failure output; never merge on "looks done."
 
-### Rail D — The report is the safety net: always written, comprehensive, durable
-Because the machine will be OFF, this report is the ONLY thing the user wakes up to. It must let them resume from cold without re-deriving tonight's context. Write it at a fixed path — `OVERNIGHT_REPORT.md` in the repo root — and **push it if a remote exists** so it's readable from a phone. It must cover:
-- **What the task/scope was** — the goal in the user's own terms.
-- **How far it got** — done, partially done, or blocked; what was merged vs parked.
-- **What passed and what failed** — the actual check results, with real error output for failures (Rail B).
-- **What to do next, and how** — the exact next step(s), concrete enough to act on immediately.
-- **Recommended skills to continue** — e.g. `gaxia-skills:start-work` to resume the doing, `gaxia-skills:benchmarking-skills` to evaluate, etc. — whenever one clearly fits the next step.
+### Rail C - Integration gate
 
-The exact skeleton the agent fills in each night — a status line up top so the user can triage from their phone in two seconds, then the detail:
+Classify the diff after verification:
+
+- **Safe changes:** merge only when the user authorized integration and the check gate is green.
+- **Risky changes:** park on a branch or review request and document why. Do not auto-apply them.
+
+Treat any of the following as risky unless the user gave explicit, task-specific authority:
+
+- Database migrations, schema changes, or destructive data operations.
+- Secrets, credentials, new environment files, or key material.
+- Large deletes, moves, or history rewrites.
+- Dependencies, lockfiles, CI, infrastructure, or deployment changes.
+- Public API and contract changes.
+- External effects such as emails, payments, production deploys, or data backfills.
+
+### Rail D - The report is the safety net
+
+Write `OVERNIGHT_REPORT.md` in the repository root unless the user names another durable location. Push it only when a remote exists and pushing is authorized. The report must include:
+
+- The requested scope.
+- Completed work, parked work, and the reason for each decision.
+- Checks that passed and failed, with actionable error output for failures.
+- Exact next steps and commands where useful.
+- Recommended capabilities or skills for resuming the work.
+
+Use this shape:
 
 ```markdown
-# Overnight Report — <task title>
-Status: SUCCESS | PARTIAL | BLOCKED · ✅<N> merged · ⏸<N> parked · ❌<N> tests fail
-<timestamp> · branch: <branch>
+# Overnight Report - <task title>
+Status: SUCCESS | PARTIAL | BLOCKED
 
 ## Scope
-<the goal, in the user's own words>
+<the requested goal>
 
 ## Where it stands
-- Merged: <what shipped>
-- Parked (needs you): <what + why — the stop-list reason>
+- Completed: <what changed>
+- Parked: <what needs authority or review, and why>
 
 ## Checks
-✅ <checks that passed — build / lint / typecheck>
-❌ <check that failed> — <the real error output, pasted, not summarized>
+<actual commands and outcomes>
 
 ## Next step
-  $ <copy-paste command, e.g. git checkout <branch> && <cmd>>
-  → <one line: what this does / where it leaves you>
+<the first concrete action to resume>
 
-## Continue with
-- gaxia-skills:start-work — <when: resume the build>
-- <other skill> — <when it fits, if any>
+## Power action
+<performed, skipped, or unavailable, with reason>
 ```
 
-### Rail E — Shutdown is the very last action, after the report is durable
-Order is fixed: finish → verify → integrate → **write report → push** → only then trigger shutdown. Never power off before the report (and any push) is safely committed. Once the box is off, nothing else can run.
+### Rail E - Bounded retries
 
-### Rail F — Right-size and don't invent work
-A trivial task, or "just do X then sleep" with no integration asked, doesn't need the full gate — short-circuit, but still write the report and shut down last. Never invent extra work to "make use of the night"; when the asked scope is done and handled, stop.
+After the same gate fails twice, stop rather than thrash. Do not silently rewrite code to force a pass. Record the failure, evidence, and next action in the report.
 
-### Rail G — Bounded retries, no overnight thrash, no silent rewrites
-If the work errors or a verify keeps failing and you can't fix it within a bounded attempt (e.g. the same gate fails twice), STOP — do not loop all night, and do NOT silently rewrite the user's code to force a pass. Record the failure, its cause, and the next step in the report (Rail D), then shut down. An honest "blocked here, do this next" beats a hidden hack the user discovers later.
+### Rail F - Right-size the work
 
-## Decision points
-- **Merge or park?** → Rail C stop-list. Safe → merge; risky → park + document.
-- **Is it actually done / passing?** → Rail B: only a green check you ran yourself counts, and the report states the truth either way.
-- **Shut down?** → Always (Rail A), after the report is durable (Rail D/E). The only thing that ever delays shutdown is a broken precondition (report not durable, irreversible change applied) — fix it, then power off.
+Do not invent overnight work. A small task may use a smaller verification and integration path, but it still needs an honest report and the same authorization rules for external effects or power actions.
 
-## Rationalizations — all wrong
-| Excuse | Reality |
-|---|---|
-| "It failed, so I should leave the machine on for the user" | Not in this mode. The user asked for the machine OFF; the report is how they pick up a failure. Park anything irreversible, document it fully, then shut down. |
-| "User pre-authorized merge, so just merge the risky migration too" | "Ship it" covers safe, finished work. Irreversible / external-effect diffs (Rail C) are parked + documented, never auto-applied — that's exactly what makes shutting down safe. |
-| "The branch looks finished, no need to run the tests" | Unattended = you are the only check. Run the project's real tests/build, and report the true result. |
-| "I'll just auto-fix the bug so it passes, then merge" | Silently rewriting the user's code overnight hides the real problem. Fix only if unambiguous + verified; else park + report + shut down. |
-| "The report can be short, the user knows the context" | They'll read it groggy, hours later, with none of tonight's context loaded. Write it to resume from cold. |
-| "Shutdown is risky after a failure, I'll skip it" | Shutdown after a durable report, with nothing irreversible applied, is safe — and is what was asked. Skipping it defies the request. |
+## Decision Points
 
-## Red Flags — STOP and re-read this skill
-- About to shut down before the report is written and (if a remote exists) pushed.
-- About to auto-merge / auto-apply a diff that touches the stop-list.
-- About to merge without having run the project's own tests + build yourself.
-- About to write a thin report that wouldn't let a cold reader resume.
-- About to silently rewrite the user's code to force a pass, or to loop on a failing gate all night.
-- About to invent extra work to fill the night.
+- **Merge or park?** Use Rail C and the user's authorization.
+- **Done or blocked?** Use Rail B's evidence, not appearance.
+- **Power down?** Only after the report is durable and the exact power action is authorized and supported.
+
+## Red Flags
+
+- About to merge a risky change without explicit authority.
+- About to report a check as passed without running it.
+- About to power down before the report is durable.
+- About to claim a shutdown the host cannot perform.
+- About to loop on a failing gate instead of recording a handoff.
 
 ## Completion
-Every run ends powered off, with `OVERNIGHT_REPORT.md` written (+ pushed if possible) reflecting one of:
-1. **Verified success** — scope done, checks green, safe diffs merged (risky ones parked + documented), report written → shutdown (last).
-2. **Partial / blocked / failed** — safe work merged, risky work parked, failures + causes + exact next steps + recommended skills documented → shutdown (last).
+
+Every run ends with a durable report. It may additionally end with a power-down only when all authorization and host preconditions are satisfied. State the actual terminal state precisely.

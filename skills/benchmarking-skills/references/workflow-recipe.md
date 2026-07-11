@@ -1,5 +1,5 @@
-# Scoped / lean Workflow recipe
-*Used in Phases 2-3. Copy this shape and fill in the scope. Proven on the 2026-06-21 run (chunk-6 passed 56/56 runners + 204/204 judges).*
+# Scoped / lean workflow recipe
+*Use in Phases 2-3. Copy this shape and fill in the scope. The numbers below are an observed configuration, not a host-independent concurrency guarantee.*
 
 ## Table of contents
 - Values to bake in · Building unit lists from scope · Chunk + idempotent rules · Post-processing · Reference implementation
@@ -12,11 +12,11 @@
 ## Building the unit lists from scope
 - **runner units** = graded scenarios (in scope) × configs × runs, where `runs = (RIGOR=='lean' ? 1 : 2)`
 - **judge units** = per run: `(scenario_type=='adversarial' || RIGOR=='rigorous') ? 3 : 1` judges ; trigger judges × `(lean ? 1 : 2)`
-- runner model = `'sonnet'`; judge model = `(RIGOR=='lean' ? 'sonnet' : 'opus')`
+- Choose the least expensive capable runner and judge for lean runs; use a stronger independent judge when rigorous scoring needs it.
 - **triggers-only** scope → no runner units at all (cheapest)
 
 ## Chunk + idempotent rules (the rate-limit lesson)
-- Run in chunks of ≤6: `for (let i=0;i<units.length;i+=6) await parallel(units.slice(i,i+6).map(...))` — never fan out all at once (cap ~16 starves the tail; ~half can fail).
+- Start in chunks of ≤6 and tune down when the host rate-limits. Do not fan out the full matrix at once.
 - Every agent is idempotent: if its destination file already exists, return `SKIPPED`. Re-run until the gap closes.
 - Decouple runner (expensive — keep) from judge (cheap — refill): run all runners first, gap-check, then judges.
 
@@ -28,4 +28,4 @@ python aggregate_scorecard.py <iteration_dir> --skill-name <name> --scope-note "
 `--scope-note` stamps provenance so a scoped/lean scorecard isn't mistaken for a full run. `merge_gradings.py` reads as utf-8-sig (BOM-safe) and takes the median of however many judges exist (1 = lean, 3 = rigorous).
 
 ## Reference implementation
-A proven runner+judge script (chunk≤6, `PHASE` flag, `STATUS` schema, runner sonnet / judge opus) was used on 2026-06-21. Mirror its `runChunked(units, makePrompt, {phase, model})` helper that loops slices of 6 and counts done/skipped/errored. Build `runnerUnits` and `judgeUnits` from the scope spec above; idempotent self-skip makes partial re-runs free.
+A proven runner and judge script used chunking, a `PHASE` flag, and a `STATUS` schema. Mirror its chunking and idempotent recovery behavior using the current host's orchestration API. Build `runnerUnits` and `judgeUnits` from the scope spec above; idempotent self-skip makes partial re-runs free.

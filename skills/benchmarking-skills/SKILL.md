@@ -1,6 +1,10 @@
 ---
 name: benchmarking-skills
-description: Use when the user wants to benchmark, test, score, evaluate, or measure how well another Claude Code skill performs — how an agent flows through its workflow, makes decisions at branch points, and holds up under pressure — or asks for tuning guidance to improve a skill. Triggers on "benchmark this skill", "ทดสอบ skill", "skill นี้ดีไหม", "ให้คะแนน skill", "ปรับจูน skill", and when a target SKILL.md path is given for evaluation.
+description: >-
+  Use when the user wants to benchmark, test, score, evaluate, or measure how
+  well another agent skill performs: how an agent follows its workflow, makes
+  decisions at branch points, and holds up under pressure. Also use for
+  evidence-backed tuning guidance when a target SKILL.md path is given.
 ---
 
 # Benchmarking Skills
@@ -33,7 +37,7 @@ Start every run by parsing a **scope spec** from the user's request (default = a
 | judges/run | 1 (neutral) / 3-median (adversarial) | 3-median every run |
 | runs/config | ×1 | ×2–3 |
 | baseline | on (delta is the core signal) | on |
-| judge model | sonnet | opus |
+| judge capability | lowest-cost capable judge | strongest available judge |
 | trigger runs | ×1 | ×2 |
 
 Switch to **rigorous** when the user says "rigorous" / "เข้มหน่อย" / "--rigorous", or when gating a real release.
@@ -49,12 +53,12 @@ Read the target SKILL.md (+ its references/agents) → extract the **Skill Contr
 Per `references/scenario-design.md` + `references/pressure-taxonomy.md`: neutral 3-5, adversarial 3-5 (each one probing a specific rail), trigger 8-10 (should / should-not). Write `scenarios.json`.
 **Exit:** the user approves scenarios.json
 
-### Phase 2 — Run: spawn runner subagents
-Per scenario, spawn a **runner** (per `agents/runner.md`) — run the target skill for real + record a Decision Log. Run **with_skill and baseline**, and **×3 per config** to measure variance. Save transcript + decision-log.md + efficiency (tokens/duration from the task notification) under `<target>-benchmark/iteration-N/<scenario_id>/<config>/run-<index>/`.
+### Phase 2 — Run: use isolated runners
+Per scenario, use a **runner** (per `agents/runner.md`) — a subagent when the host supports it, otherwise an isolated run or fresh context. Run the target skill for real and record a Decision Log. Run **with_skill and baseline**, and **×3 per config** to measure variance. Save transcript, decision-log.md, and available efficiency data under `<target>-benchmark/iteration-N/<scenario_id>/<config>/run-<index>/`.
 **Exit:** every run has a decision-log.md + transcript
 
-### Phase 3 — Judge: spawn judge subagents
-Per run, spawn a **judge** (per `agents/judge.md`) to read the rubric + Contract + Decision Log + **the real transcript** → write `grading.json`. For the contestable dimensions (workflow_adherence/decision_quality/robustness), spawn **3 judges → median**. Trigger records are scored correct = (should_fire == fired).
+### Phase 3 — Judge: use independent judges
+Per run, use a **judge** (per `agents/judge.md`) to read the rubric, Contract, Decision Log, and **the real transcript** and write `grading.json`. For contestable dimensions (workflow_adherence, decision_quality, robustness), use **3 independent judges and the median** when the host can provide independence. Trigger records are scored correct = (should_fire == fired).
 **Exit:** every run has a grading.json matching the schema
 
 ### Phase 4 — Aggregate: roll up into a scorecard
@@ -70,11 +74,11 @@ Per `agents/tuning-advisor.md`: map low scores / flags / failure points → conc
 **Exit:** every item in tuning-report.md is tied to real evidence
 
 ## Scale & rate-limit robustness (Phase 2-3 fan-out)
-Phases 2-3 spawn many subagents (runner + judge combined can be 100+). Real lesson: fanning out all at once at the concurrency cap (~16) makes the server respond "Server is temporarily limiting requests (not your usage limit)" and then **starve the tail of the batch** — roughly half can fail. Recipe:
-1. **Chunk the fan-out:** if runner + judge total > 50, don't parallelize them all at once — `await parallel()` one slice of ~6 at a time (forces concurrency ≤6 + spaces the chunks out). Evidence: chunk-6 passed 46/46 after cap-16 failed ~50%.
-2. **Decouple the runner (expensive; once it survives, keep it) from the judge (cheap; can be refilled)** — don't re-run the whole matrix to fix a partial failure; the runner is the expensive part and should not be thrown away.
-3. **Idempotent recovery:** compute the gap (which run is missing which grading-j / which trigger has none yet) and spawn only the holes; have each agent self-skip if the destination file already exists → you can re-run repeatedly until the gap closes.
-4. If you use the Workflow tool: **bake the parameters straight into the script** — `args` may not reach the script (seen: the script saw `{}` and ran the full default).
+Phases 2-3 may require many runners and judges. Fanning everything out at a host's concurrency limit can starve the tail of the batch. Recipe:
+1. **Chunk the fan-out:** when the matrix is large, start with slices of about six and tune down if the host rate-limits.
+2. **Keep runners separate from judges:** retain successful, expensive runner artifacts and refill only missing judges.
+3. **Recover idempotently:** compute missing runs or gradings and create only the gaps. Each worker should self-skip a destination that already exists.
+4. **Pass scope explicitly:** do not assume a host workflow wrapper forwards arbitrary arguments to a script.
 
 > A scoped/lean Workflow shape (build the unit lists from the scope spec + chunk≤6 + idempotent self-skip): see `references/workflow-recipe.md`
 

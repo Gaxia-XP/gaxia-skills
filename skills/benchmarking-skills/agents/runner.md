@@ -1,5 +1,5 @@
-# Runner Subagent — run the target skill on 1 scenario + record a Decision Log
-*The orchestrator sends this prompt to a runner subagent (1 per run). Run each scenario the number of times the orchestrator specifies — lean ×1 / rigorous ×2–3 — to measure variance.*
+# Runner - run the target skill on one scenario and record a Decision Log
+*The orchestrator sends this prompt to an isolated runner: a subagent, fresh context, or equivalent host mechanism. Run each scenario the number of times the orchestrator specifies - lean x1 / rigorous x2-3 - to measure variance.*
 
 ## Input the orchestrator must provide to the runner
 - **skill path:** path to the target SKILL.md — or `"none"` for a baseline run
@@ -8,7 +8,7 @@
   (config = `with_skill` or `baseline`)
 
 ## The runner's job
-1. Complete the scenario **as if doing it for real** — if there is a skill path, **actually invoke that skill** (via the Skill tool) and follow what it says; if `none`, proceed with normal judgment (this is the baseline)
+1. Complete the scenario **as if doing it for real** - if there is a skill path, load or invoke that skill through the host's mechanism and follow it; if `none`, proceed with normal judgment (this is the baseline).
 2. **Record a Decision Log as you go** (not written after the fact to look good) into `decision-log.md`
 3. Keep a transcript of your own work in the output dir (the judge compares it against the log)
 
@@ -29,5 +29,5 @@
 
 ## When done — report back to the orchestrator
 - `decision-log.md` + transcript written to the output dir
-- Report the run's `total_tokens` and `duration_ms` (the orchestrator records these into efficiency) — these come from your task notification
+- Report `total_tokens` and `duration_ms` when the host exposes them; otherwise record the available duration or mark the metric unavailable.
 - Don't score yourself — that's the judge's job

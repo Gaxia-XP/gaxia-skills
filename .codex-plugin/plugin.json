@@ -1,0 +1,29 @@
+{
+  "name": "gaxia-skills",
+  "version": "0.8.0",
+  "description": "Portable workflow skills for coding agents, with Claude Code and Codex adapters.",
+  "author": {
+    "name": "Gaxia-XP",
+    "url": "https://github.com/Gaxia-XP"
+  },
+  "homepage": "https://github.com/Gaxia-XP/gaxia-skills",
+  "repository": "https://github.com/Gaxia-XP/gaxia-skills",
+  "license": "MIT",
+  "keywords": ["skills", "workflows", "benchmarking", "agents"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Gaxia Skills",
+    "shortDescription": "Portable workflow skills for coding agents.",
+    "longDescription": "Model-neutral workflow skills with adapters for Claude Code and Codex.",
+    "developerName": "Gaxia-XP",
+    "category": "Productivity",
+    "capabilities": ["Interactive"],
+    "websiteURL": "https://github.com/Gaxia-XP/gaxia-skills",
+    "defaultPrompt": [
+      "Route this coding task with start-work.",
+      "Benchmark a skill with real scenarios.",
+      "Help me create a robust workflow skill."
+    ],
+    "brandColor": "#0B7D68"
+  }
+}
