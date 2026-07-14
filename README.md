@@ -50,6 +50,15 @@ native tool, installed skill, subagent role, or documented host procedure.
 The Claude Code adapter retains the existing mappings to optional companion
 skill packs. They are not required by the portable core.
 
+## Credits
+
+`start-work` and `creating-workflow-skills` orchestrate capabilities from these packs — thank you:
+
+- [superpowers](https://github.com/obra/superpowers) — Jesse Vincent / obra (MIT)
+- [mattpocock-skills](https://github.com/mattpocock/skills) — Matt Pocock (MIT)
+- [9arm-skills](https://github.com/thananon/9arm-skills) — thananon (9arm)
+- [feature-dev](https://github.com/anthropics/claude-plugins-public/tree/main/plugins/feature-dev) — Anthropic, `@claude-plugins-official` (Apache-2.0)
+
 ## License
 
 MIT © 2026 Gaxia-XP
