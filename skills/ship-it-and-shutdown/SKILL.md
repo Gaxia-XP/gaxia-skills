@@ -27,7 +27,7 @@ Active for the whole unattended run, every step, until the machine powers off. T
 
 ### Rail A - The terminal action always happens, and always last
 
-Power the machine off at the end of every run — verified success or not — but ONLY after the report is written and durable (Rail D) and no irreversible change was auto-applied (Rail C). Order is absolute: nothing runs after shutdown, so the report and any push must land first. There is no "stay on" branch — a blocked or failed task is handled by the report, not by leaving the box awake. The one thing that can still stop a shutdown is a *broken precondition*: report not yet durable, or an irreversible change was applied and can't be verified safe. Fix the precondition (or park the change), then shut down.
+Power the machine off at the end of every run — verified success or not. No exception. Order is absolute: report first, then shutdown — the report must be written and pushed (if a remote exists) before the machine goes off, so it is readable from a phone. There is no "stay on" branch, no precondition that cancels shutdown. If the report is not yet written, write it now, then shut down. If an irreversible change was not safely parked, document it in the report, then shut down. The run **always** ends with the machine off.
 
 ### Rail B - Definition of done is self-checkable, and the result is reported honestly
 
