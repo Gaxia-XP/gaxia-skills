@@ -1,7 +1,7 @@
 {
   "name": "gaxia-skills",
   "description": "Portable workflow skills for coding agents: author workflows, route work, benchmark skills, learn topics, minimize context cost, and run authorized unattended work with durable reporting.",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "author": { "name": "Gaxia-XP" },
   "skills": [
     "./skills/start-work",
