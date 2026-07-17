@@ -4,6 +4,24 @@ All notable changes to **gaxia-skills** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/), and the project
 aims to follow [Semantic Versioning](https://semver.org/).
 
+## [0.9.0] — 2026-07-18
+
+### Changed
+- **think-first: context-based triggering.** Rewrote the description from
+  keyword-matching to a context-based trigger — the skill now fires on any
+  coding task (implementation, fix, refactor, edit), including implicit ones
+  (bug reports, performance issues, feature requests) that don't say "fix" or
+  "implement". Caution phrases ("ทำให้หน่อย", "อย่าทำมั่ว", "อย่าแก้มั่ว",
+  "don't mess it up", "be careful") now only fire when paired with a coding
+  task — they no longer trigger on read-only work (review, explanation,
+  analysis, translation). Rule 1 heading renamed "คิดก่อนเขียน" →
+  "ระบุ assumption ก่อนแตะโค้ด" to drop an unnatural keyword.
+
+### Notes
+- Benchmarked before ship (think-first-benchmark/iteration-1): with_skill A/5.0
+  vs baseline F/0.33; triggering accuracy 9/9 (1.0), up from 6/9 (0.667) on the
+  pre-fix description. workflow_adherence, robustness, output_quality all 5.0.
+
 ## [0.8.1] — 2026-07-17
 
 ### Fixed

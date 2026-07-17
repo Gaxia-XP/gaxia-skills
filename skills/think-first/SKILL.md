@@ -1,13 +1,18 @@
 ---
 name: think-first
 description: >-
-  Use before starting any coding task - implementation, fix, refactor, or edit
-  - to apply four discipline rules that prevent common LLM coding mistakes:
-  think before touching code, write the minimum that solves the problem, touch
-  only what was asked, and define a verifiable goal before looping. Triggers on
-  "คิดก่อน", "ช้าๆ", "ไม่ต้องรีบ", "measure twice", "slow down", "don't
-  over-engineer", or /think-first. This is not a workflow; apply it as a filter
-  before work begins.
+  Use before any coding task — implementation, fix, refactor, or edit —
+  whenever the user asks Claude to write or change code. This includes bug
+  reports, performance issues, and feature requests that imply code changes,
+  even when the user doesn't explicitly say "fix" or "implement". Applies four
+  discipline rules as a pre-coding filter: state assumptions before touching
+  anything, write only the minimum that solves the problem, touch only what was
+  asked, and define a verifiable goal before looping. Also triggers on
+  /think-first, or when these caution phrases appear in a coding request:
+  "ทำให้หน่อย", "อย่าทำมั่ว", "อย่าแก้มั่ว", "don't mess it up", "be careful".
+  These keywords only fire when the task involves writing or changing code —
+  they do not trigger for read-only tasks (code review, explanation, analysis,
+  translation).
 ---
 
 # Think First (LLM coding discipline)
@@ -19,7 +24,7 @@ _Derived from Andrej Karpathy's LLM coding pitfall observations, extended with L
 
 ---
 
-## Rule 1 — คิดก่อนเขียน: ไม่ชัวร์ต้องถาม ไม่เดาเงียบๆ
+## Rule 1 — ระบุ assumption ก่อนแตะโค้ด: ไม่ชัวร์ต้องถาม ไม่เดาเงียบๆ
 
 State assumptions before you touch anything. If there are multiple valid interpretations, surface them — don't pick silently.
 
