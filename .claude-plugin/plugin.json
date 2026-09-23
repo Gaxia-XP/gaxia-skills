@@ -13,6 +13,7 @@
     "./skills/ship-it-and-shutdown",
     "./skills/think-first",
     "./skills/pick-skill",
-    "./skills/lessons-capture"
+    "./skills/lessons-capture",
+    "./skills/stand-up-server-agent"
   ]
 }
