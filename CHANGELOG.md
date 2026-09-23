@@ -4,6 +4,22 @@ All notable changes to **gaxia-skills** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/), and the project
 aims to follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- **web-companion (new skill).** Interactive browser screen for visual
+  choices, lesson pages, and mockups: one URL, auto-reload on push, clicks
+  back as JSON lines. `companion.submit()` collects quiz answers and form
+  input on the page (radio/checkbox/text/select) so the chat reply stays a
+  wake-up nudge; whole flows batch into one self-contained screen.
+  Ships with a vendored offline theme (Bootstrap v5.3 dark + Prism v1.29.0
+  code highlighting, both MIT) and a smoke test (9 checks).
+- **lemme-teach-you: on-page answers, images, checklist toggle, 4th style.**
+  Checks, confirms, and quizzes live on the companion page by default;
+  lesson screens carry an inline-SVG diagram wherever one clarifies and a
+  collapsible checklist toggle; style cards are always 4 (3 curated +
+  Agent-designed on the vendored theme, never hand-rolled).
+
 ## [0.9.0] — 2026-07-18
 
 ### Changed
