@@ -4,6 +4,43 @@ All notable changes to **gaxia-skills** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/), and the project
 aims to follow [Semantic Versioning](https://semver.org/).
 
+## [0.10.0] — 2026-09-23
+
+### Added
+- **web-companion (new skill).** Interactive browser screen for visual
+  choices, lesson pages, and mockups: one URL, auto-reload on push, clicks
+  back as JSON lines. `companion.submit()` collects quiz answers and form
+  input on the page (radio/checkbox/text/select) so the chat reply stays a
+  wake-up nudge; whole flows batch into one screen. Node-only launcher for
+  any OS (`start-companion.cjs`, with a PowerShell wrapper) that reuses a
+  live server, restarts a dead one on the same URL, and stops cleanly.
+  Vendored offline theme served at `/theme/` (Bootstrap v5.3.8 dark + Prism
+  v1.30.0, both MIT, notices in `theme/THIRD_PARTY_NOTICES.md`) and a Node
+  smoke test (22 checks).
+- **pick-skill (new skill).** Picks one owner when the user asks which skill
+  fits or several installed skills overlap; declares skill-less work instead
+  of forcing a pick. `start-work` stays the default router.
+- **lessons-capture (new skill).** Turns failed attempts and novel fixes into
+  one durable rule each — a user-approved Pitfalls patch for skills the user
+  maintains, host memory otherwise (never edits installed plugin copies).
+- **stand-up-server-agent (new skill).** Stands up or recovers a persistent
+  self-hosted AI assistant on a server: snapshot-gated restore or fresh
+  install, storage rescue, and lifelines, with explicit approval before
+  external effects.
+
+### Changed
+- **lemme-teach-you: on-page answers, images, checklist toggle, 4 styles.**
+  Outcomes-first outline with a visible checklist and a batched prerequisite
+  check; practical mode asks who drives and teaches one step at a time. When
+  `web-companion` can run, checks, confirms, and quizzes live on the page;
+  lesson screens carry an inline-SVG diagram wherever one clarifies and a
+  collapsible checklist toggle; style cards are always 4 (Explainer, Slides,
+  Cheat-sheet, Agent-designed), all on the vendored theme.
+
+### Notes
+- Version bumped across `.claude-plugin/plugin.json`,
+  `.claude-plugin/marketplace.json`, and `.codex-plugin/plugin.json`.
+
 ## [0.9.0] — 2026-07-18
 
 ### Changed
@@ -82,5 +119,7 @@ aims to follow [Semantic Versioning](https://semver.org/).
 - Initial repo scaffold: manifests, MIT license, and the first workflow skills
   (`start-work`, `benchmarking-skills`, `creating-workflow-skills`).
 
+[0.10.0]: https://github.com/Gaxia-XP/gaxia-skills/releases
+[0.9.0]: https://github.com/Gaxia-XP/gaxia-skills/releases
 [0.8.1]: https://github.com/Gaxia-XP/gaxia-skills/releases
 [0.8.0]: https://github.com/Gaxia-XP/gaxia-skills/releases

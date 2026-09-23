@@ -1,15 +1,19 @@
 {
   "name": "gaxia-skills",
-  "description": "Portable workflow skills for coding agents: author workflows, route work, benchmark skills, learn topics, minimize context cost, and run authorized unattended work with durable reporting.",
-  "version": "0.9.0",
+  "description": "Portable workflow skills for coding agents: author workflows, route work, pick skills, benchmark skills, learn topics with an interactive browser companion, capture lessons, minimize context cost, stand up server agents, and run authorized unattended work with durable reporting.",
+  "version": "0.10.0",
   "author": { "name": "Gaxia-XP" },
   "skills": [
     "./skills/start-work",
     "./skills/benchmarking-skills",
     "./skills/creating-workflow-skills",
     "./skills/lemme-teach-you",
+    "./skills/web-companion",
     "./skills/dont-burn-my-tokens",
     "./skills/ship-it-and-shutdown",
-    "./skills/think-first"
+    "./skills/think-first",
+    "./skills/pick-skill",
+    "./skills/lessons-capture",
+    "./skills/stand-up-server-agent"
   ]
 }

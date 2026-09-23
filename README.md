@@ -19,6 +19,10 @@ Codex additionally have native manifests in this repository.
 | `dont-burn-my-tokens` | Reduce cost and context use without lowering verification standards. |
 | `ship-it-and-shutdown` | Run an authorized unattended task, preserve a durable report, and power down only when the host permits it. |
 | `think-first` | Apply discipline rules before a coding change. |
+| `web-companion` | Show an interactive browser screen and read the user's clicks and answers back. |
+| `pick-skill` | Choose one skill when several could own a task, or work skill-less. |
+| `lessons-capture` | Turn failed attempts and novel fixes into durable, reusable rules. |
+| `stand-up-server-agent` | Install or recover a persistent self-hosted AI assistant on a server. |
 
 ## Compatibility
 
