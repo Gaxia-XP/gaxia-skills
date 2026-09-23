@@ -9,9 +9,11 @@
   var MIN_MS = 500, MAX_MS = 30000, backoff = MIN_MS, timer = null, ws = null;
 
   function key() {
-    // Server cookie is named companion-key-<port>; match the full name.
-    var m = document.cookie.match(/(?:^|;\s*)(companion-key-\d+)=([^;]*)/);
-    if (m) return decodeURIComponent(m[2]);
+    // Server cookie is named companion-key-<port>. Browsers share localhost
+    // cookies across ports, so match THIS tab's port — another session's key
+    // would be rejected and the tab would silently stop reporting.
+    var m = document.cookie.match(new RegExp('(?:^|;\\s*)companion-key-' + window.location.port + '=([^;]*)'));
+    if (m) return decodeURIComponent(m[1]);
     m = window.location.search.match(/[?&]key=([^&]*)/);
     return m ? decodeURIComponent(m[1]) : null;
   }

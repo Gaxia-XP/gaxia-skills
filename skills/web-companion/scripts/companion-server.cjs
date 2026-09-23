@@ -1,5 +1,6 @@
 // Web-companion server — Node stdlib only (no npm install).
-// One URL serves the newest .html screen in <session>/content.
+// One URL serves the newest .html screen in <session>/content; /theme/<file>
+// serves the vendored offline theme (../theme) so screens can <link> it.
 // Browser clicks carrying a `choice` field are appended to <session>/state/events.
 // Env: COMPANION_DIR, COMPANION_HOST, COMPANION_URL_HOST, COMPANION_PORT,
 //      COMPANION_PORT_FILE, COMPANION_IDLE_TIMEOUT_MS
@@ -30,6 +31,18 @@ const TOKEN = (() => {
   return crypto.randomBytes(24).toString('hex');
 })();
 const HELPER = fs.readFileSync(path.join(__dirname, 'companion-helper.js'), 'utf-8');
+const THEME_DIR = path.join(__dirname, '..', 'theme');
+const THEME_FILES = (() => {
+  try { return new Set(fs.readdirSync(THEME_DIR).filter(f => /\.(css|js)$/.test(f))); }
+  catch (e) { return new Set(); }
+})();
+const MIME = {
+  '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8', '.json': 'application/json',
+  '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif', '.webp': 'image/webp', '.svg': 'image/svg+xml',
+};
+const mimeOf = f => MIME[path.extname(f).toLowerCase()] || 'application/octet-stream';
 const INJECT = '<script>\n' + HELPER + '\n</script>';
 
 function preferredPort() {
@@ -183,16 +196,20 @@ const server = http.createServer((req, res) => {
     return;
   }
   if (req.method === 'GET' && url.pathname.startsWith('/files/')) {
-    const fp = path.join(CONTENT_DIR, path.basename(url.pathname.slice(7)));
+    let name; try { name = decodeURIComponent(url.pathname.slice(7)); } catch (e) { name = ''; }
+    const fp = path.join(CONTENT_DIR, path.basename(name));
     if (!insideContent(fp)) {
       res.writeHead(404, headers()); res.end('Not found'); return;
     }
-    const ext = path.extname(fp).toLowerCase();
-    const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css',
-      '.js': 'text/javascript', '.json': 'application/json',
-      '.png': 'image/png', '.svg': 'image/svg+xml' }[ext] || 'application/octet-stream';
-    res.writeHead(200, headers({ 'Content-Type': mime }));
+    res.writeHead(200, headers({ 'Content-Type': mimeOf(fp) }));
     res.end(fs.readFileSync(fp));
+    return;
+  }
+  if (req.method === 'GET' && url.pathname.startsWith('/theme/')) {
+    const name = url.pathname.slice(7);
+    if (!THEME_FILES.has(name)) { res.writeHead(404, headers()); res.end('Not found'); return; }
+    res.writeHead(200, headers({ 'Content-Type': mimeOf(name), 'Cache-Control': 'private, max-age=86400' }));
+    res.end(fs.readFileSync(path.join(THEME_DIR, name)));
     return;
   }
   res.writeHead(404, headers()); res.end('Not found');
@@ -221,11 +238,23 @@ try {
   }).on('error', e => console.error('watch error:', e.message));
 } catch (e) { console.error('watch unavailable:', e.message); }
 
+// The state files belong to whichever server wrote server-info last. A stale
+// second server (same SessionDir) must not mark the live one as stopped.
+function ownsState() {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(STATE_DIR, 'server-info'), 'utf-8')).pid === process.pid;
+  } catch (e) { return true; }
+}
+let stopping = false;
 function shutdown(reason) {
+  if (stopping) return;
+  stopping = true;
   console.log(JSON.stringify({ type: 'server-stopped', reason }));
-  try { fs.unlinkSync(path.join(STATE_DIR, 'server-info')); } catch (e) {}
-  fs.writeFileSync(path.join(STATE_DIR, 'server-stopped'),
-    JSON.stringify({ reason, timestamp: Date.now() }) + '\n');
+  if (ownsState()) {
+    try { fs.unlinkSync(path.join(STATE_DIR, 'server-info')); } catch (e) {}
+    fs.writeFileSync(path.join(STATE_DIR, 'server-stopped'),
+      JSON.stringify({ reason, pid: process.pid, timestamp: Date.now() }) + '\n');
+  }
   for (const s of clients) { try { s.destroy(); } catch (e) {} }
   server.close(() => process.exit(0));
   setTimeout(() => process.exit(0), 2000).unref();
@@ -233,6 +262,9 @@ function shutdown(reason) {
 setInterval(() => {
   if (Date.now() - lastActivity > IDLE_MS) shutdown('idle timeout');
 }, 60 * 1000).unref();
+for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
+  try { process.on(sig, () => shutdown(sig)); } catch (e) { /* unsupported here */ }
+}
 
 let fellBack = false;
 server.on('error', e => {
@@ -257,6 +289,7 @@ server.on('listening', () => {
     pid: process.pid,
   });
   console.log(info);
+  try { fs.unlinkSync(path.join(STATE_DIR, 'server-stopped')); } catch (e) { /* none */ }
   fs.writeFileSync(path.join(STATE_DIR, 'server-info'), info + '\n');
 });
 server.listen(PORT, HOST);
