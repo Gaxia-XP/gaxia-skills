@@ -11,6 +11,8 @@
     "./skills/web-companion",
     "./skills/dont-burn-my-tokens",
     "./skills/ship-it-and-shutdown",
-    "./skills/think-first"
+    "./skills/think-first",
+    "./skills/pick-skill",
+    "./skills/lessons-capture"
   ]
 }
