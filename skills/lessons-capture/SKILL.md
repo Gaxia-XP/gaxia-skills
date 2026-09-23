@@ -1,12 +1,12 @@
 ---
 name: lessons-capture
 description: >-
-  Captures failed attempts and novel fixes as reusable skill rules.
-  Use when an attempt fails after real effort or a never-seen-before problem
-  gets solved with a generalizable fix: "จำไว้ว่าวิธีนี้พัง",
-  "รอบหน้าอย่าทำแบบนี้", or any dead end worth not repeating.
-  Do not use when the user only reports routine success with no new problem
-  or method (e.g. "วิธีนี้เวิร์คดีมาก" alone).
+  Use when an attempt fails after real effort, or a never-seen-before problem
+  gets solved with a generalizable fix, and the lesson should outlive the
+  session: "จำไว้ว่าวิธีนี้พัง", "รอบหน้าอย่าทำแบบนี้", "remember this
+  failure", or any dead end worth not repeating. Captures it as a reusable rule.
+  Do not use when the user only reports routine success with no new problem or
+  method (e.g. "วิธีนี้เวิร์คดีมาก" alone).
 ---
 
 # Lessons Capture
@@ -25,32 +25,33 @@ Resolve recording targets using the host adapter and `adapters/capabilities.md`.
 
 ## Procedure
 
-1. Capture the failure. Write what was tried, the evidence it failed (tool output,
-   error text, observed behavior), and what to try instead. One lesson per entry.
-   Every entry uses the same shape: [สิ่งที่ลอง] + [หลักฐาน: output/error/
-   behavior หรือ "รอเติม: ..."] + [ครั้งหน้าทำแทน] — if a slot is empty, write
-   "รอเติม: <สิ่งที่ต้องถาม>" plus one pointed question instead of leaving it
-   blank. Never merge several issues into one blob to finish faster (a merged
-   blob cannot be reused next time).
-   If rushed with no evidence yet: capture what is known first (what-tried in
-   one line + [รอหลักฐาน: คำสั่ง/error]) then ask for the minimum evidence per
-   issue, one question at a time. Never invent evidence, and never merge several
-   issues into one entry to finish faster.
+1. Capture the failure. One lesson per entry, every entry in the same shape:
+   [สิ่งที่ลอง] + [หลักฐาน: output/error/behavior] + [ครั้งหน้าทำแทน].
+   If evidence is missing (e.g. the user is rushed), write the known parts first,
+   put "รอเติม: <สิ่งที่ต้องถาม>" in each empty slot, then ask one pointed
+   question per missing slot, one at a time. Never invent evidence. Never merge
+   several issues into one entry to finish faster — a merged blob cannot be
+   reused next time.
    **Exit:** the failure is stated plainly enough that a stranger would avoid it.
-2. File it where it will be read. If a skill owns the task, patch that skill's
-   Pitfalls section with one rule plus why. If no skill owns it, record it in the
-   host's durable memory. Never leave it only in chat.
+2. File it where it will be read — exactly one destination:
+   - A skill owns the task and its SKILL.md is source the user maintains (a repo
+     checkout or personal skills folder): propose the patch to its Pitfalls
+     section — one rule plus why — and apply it once the user approves.
+   - The owning skill comes from a plugin/marketplace install or a third party:
+     don't edit it (the next update erases the lesson, and it isn't the user's
+     file). Record the lesson in the host's durable memory with the skill's
+     name, and offer upstream issue text if the user wants it.
+   - No skill owns the task: record it in the host's durable memory.
+   Never leave it only in chat, and never write task lessons into this skill's
+   own file.
    **Exit:** the lesson lives in exactly one durable place, no duplicates.
 3. Promote solved novelty. When a first-of-its-kind problem was fixed, add the
-   prevention or fast-response rule to the owning skill, or extend this skill's
-   host notes when no owner exists.
+   prevention or fast-response rule to the destination Step 2 chose, under the
+   same approval rule.
    **Exit:** a future run hitting the same problem finds the answer without search.
 4. Prune on write. If the new rule replaces older wording, delete the old wording.
    Skills accumulate sediment; each addition must keep the file shorter or clearer.
    **Exit:** no duplicated or contradicted rules remain.
-   Final gate before reporting done: re-read the patched section (or the full
-   draft entry) and report in one sentence what changed where — never claim
-   "ตรวจแล้ว" without a read/trace to back it.
 
 ## Pitfalls
 
@@ -60,8 +61,10 @@ Resolve recording targets using the host adapter and `adapters/capabilities.md`.
 - Turning every hiccup into a rule: one-off environment flukes are session notes,
   not skill rules.
 - Rewriting the whole skill for one lesson: patch the Pitfalls section, nothing more.
+- Patching an installed plugin's SKILL.md: the next update silently erases it.
 
 ## Verification
 
-- Re-read the patched section: the new rule plus its reason is present.
+- Re-read the patched section or memory entry: the new rule plus its reason is
+  present. Never claim "ตรวจแล้ว" without a read to back it.
 - State what changed and where in one sentence before continuing other work.

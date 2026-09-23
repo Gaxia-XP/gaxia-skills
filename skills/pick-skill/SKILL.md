@@ -1,11 +1,11 @@
 ---
 name: pick-skill
 description: >-
-  Picks the right skill for a vague task from installed or installable skills.
-  Use when starting work and no skill obviously owns it: "ไม่รู้ใช้ skill ไหน",
-  "เลือก skill ให้หน่อย", or any task with several candidate skills.
-  Do not use for tasks start-work already routes clearly, or when no skill
-  fits at all (proceed skill-less instead of forcing one).
+  Use when the user asks which skill fits a job ("ไม่รู้ใช้ skill ไหน",
+  "เลือก skill ให้หน่อย", "which skill should I use"), or when two or more
+  installed skills plausibly own the same task. Picks one owner from names and
+  descriptions, or declares skill-less work instead of forcing one. Not the
+  default entry point for new work — start-work routes ordinary requests.
 ---
 
 # Pick Skill
@@ -16,22 +16,23 @@ adapter (`adapters/`); never claim a skill ran that the host cannot load.
 
 ## When to Use
 
-- A task arrives with no explicit skill and several plausible candidates.
 - The user asks which skill fits a job.
+- Several installed skills plausibly own the same task.
 - An installed skill exists but its trigger is ambiguous for this task.
-- Don't use for: tasks `start-work` already routes clearly; cases where no skill
-  fits at all (proceed skill-less instead of forcing one).
+- Don't use for: routing ordinary new work (`start-work` owns that); tasks with
+  one obvious owner; cases where no skill fits at all (proceed skill-less
+  instead of forcing one).
 
 ## Procedure
 
 1. List candidates. Get the host's skill list (names plus one-line descriptions
-   only, not full bodies). Include installed packs and, when the host supports
-   it, installable external skills.
-   **Exit:** 1-4 candidate names, or a written statement that none fits.
-   Do not announce a pick or skill-less work until the candidate names are
-   written in the transcript first — if none fits, name the closest rejects
-   plus a half-sentence reason, e.g. "ดูแล้ว: music, songwriting-and-ai-music,
-   heartmula — ไม่มีตัวไหนเป็นเจ้าของงานนี้ เลยทำแบบไม่ใช้ skill ครับ".
+   only, not full bodies). Look at installed skills first; list installable
+   external skills only when none installed fits and the host can install.
+   Write the candidate names in the transcript before announcing a pick or
+   skill-less work. If none fits, name the closest rejects plus a half-sentence
+   reason, e.g. "ดูแล้ว: pdf, docx, xlsx — ไม่มีตัวไหนเป็นเจ้าของงานนี้
+   เลยทำแบบไม่ใช้ skill ครับ".
+   **Exit:** 1-4 candidate names written, or a written statement that none fits.
 2. Match task verbs to triggers. Compare what the task DOES (debug, plan, ship,
    review, write, automate) against each candidate's When to Use. Prefer the
    narrowest skill that owns the whole task over a broad one that half-covers it.
@@ -39,14 +40,15 @@ adapter (`adapters/`); never claim a skill ran that the host cannot load.
 3. Break ties by evidence cost. If two skills fit, choose the one whose procedure
    produces checkable evidence for this task's definition of done.
    **Exit:** the tie-break reason in half a sentence.
-4. Announce and load. State the pick plus why in one sentence, then load that
-   skill and follow it. If none fits, say so and continue without a skill rather
-   than shoehorning one.
+4. Announce and load. State the pick plus why in one sentence, naming the
+   criterion that decided it by its term — `narrowest full owner` or
+   `checkable evidence` — rather than a vague paraphrase, e.g. "เลือก
+   systematic-debugging เพราะเป็น narrowest full owner ของงานนี้ และให้
+   checkable evidence ด้วยการ reproduce บั๊กจริงครับ". Then load that skill and
+   follow it. If the pick is an external skill that is not installed, ask the
+   user before installing — never install on your own. If none fits, say so and
+   continue without a skill rather than shoehorning one.
    **Exit:** the chosen skill is loaded, or skill-less work is declared.
-   The announce sentence must quote the criterion verbatim for half a sentence
-   (narrowest full-owner / checkable evidence for this DoD) — never paraphrase
-   only, e.g. "เลือก scrutinize เพราะ narrowest full-owner ของงานนี้ และให้
-   checkable evidence for this DoD ด้วย trace เส้นทางโค้ดจริงครับ".
 
 ## Robustness
 
@@ -64,8 +66,8 @@ adapter (`adapters/`); never claim a skill ran that the host cannot load.
   one owner.
 - Reading full SKILL.md bodies to choose: decide from names plus descriptions,
   load the full body only after picking.
-- Installing an external skill when an installed one fits: local first, install
-  only on a genuine gap.
+- Installing an external skill when an installed one fits: local first, and
+  install only on a genuine gap with the user's approval.
 - Re-picking mid-task on every doubt: one pick per task unless evidence proves
   it wrong.
 
