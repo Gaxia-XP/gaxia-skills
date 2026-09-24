@@ -23,6 +23,7 @@ Codex additionally have native manifests in this repository.
 | `pick-skill` | Choose one skill when several could own a task, or work skill-less. |
 | `lessons-capture` | Turn failed attempts and novel fixes into durable, reusable rules. |
 | `stand-up-server-agent` | Install or recover a persistent self-hosted AI assistant on a server. |
+| `cut-release` | Publish a version: bump every manifest, write the changelog entry, tag the verified commit. |
 
 ## Compatibility
 

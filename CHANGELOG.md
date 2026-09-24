@@ -4,6 +4,16 @@ All notable changes to **gaxia-skills** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/), and the project
 aims to follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- **cut-release (new skill).** Publishes a version so the manifests, the
+  changelog entry, and the tag all describe the same verified commit. Asks
+  before pushing tags or publishing, never moves a published tag, and hands
+  the user exact commands when the host cannot push tags.
+- **CI.** Repo consistency checks (`scripts/check_repo.py`), Python tests,
+  and the web-companion smoke test on Ubuntu, Windows, and macOS.
+
 ## [0.10.0] — 2026-09-23
 
 ### Added

@@ -14,6 +14,7 @@
     "./skills/think-first",
     "./skills/pick-skill",
     "./skills/lessons-capture",
-    "./skills/stand-up-server-agent"
+    "./skills/stand-up-server-agent",
+    "./skills/cut-release"
   ]
 }
