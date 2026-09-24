@@ -53,7 +53,7 @@ function preferredPort() {
       if (Number.isInteger(p) && p > 1023 && p < 65536) return p;
     } catch (e) { /* no prior port */ }
   }
-  return 49152 + Math.floor(Math.random() * 16383);
+  return 0; // first boot: the OS picks a free port it will actually let us bind
 }
 let PORT = preferredPort();
 let COOKIE = 'companion-key-' + PORT;
@@ -268,14 +268,16 @@ for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
 
 let fellBack = false;
 server.on('error', e => {
-  if (e.code === 'EADDRINUSE' && !fellBack) {
+  // EACCES: Windows reserves TCP port blocks (Hyper-V, WinNAT) that fail
+  // with EACCES rather than EADDRINUSE.
+  if ((e.code === 'EADDRINUSE' || e.code === 'EACCES') && !fellBack) {
     fellBack = true;
-    PORT = 49152 + Math.floor(Math.random() * 16383);
-    COOKIE = 'companion-key-' + PORT;
-    server.listen(PORT, HOST);
+    server.listen(0, HOST);
   } else { console.error('listen failed:', e.message); process.exit(1); }
 });
 server.on('listening', () => {
+  PORT = server.address().port;
+  COOKIE = 'companion-key-' + PORT;
   if (PORT_FILE && !fellBack) {
     try { fs.writeFileSync(PORT_FILE, String(PORT)); } catch (e) { /* best effort */ }
   }

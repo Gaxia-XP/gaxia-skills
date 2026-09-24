@@ -98,7 +98,9 @@ async function start() {
     await sleep(100);
   }
   try { process.kill(child.pid); } catch (e) { /* already exited */ }
-  console.error('server did not start; see ' + log + '.err');
+  let reason = '';
+  try { reason = fs.readFileSync(log + '.err', 'utf-8').trim(); } catch (e) { /* no log */ }
+  console.error('server did not start' + (reason ? ': ' + reason : '') + '; see ' + log + '.err');
   process.exitCode = 1;
 }
 
