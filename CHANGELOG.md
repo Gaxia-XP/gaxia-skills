@@ -4,6 +4,24 @@ All notable changes to **gaxia-skills** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/), and the project
 aims to follow [Semantic Versioning](https://semver.org/).
 
+## [0.11.1] — 2026-09-24
+
+### Fixed
+- **web-companion: server no longer exits on Windows reserved ports.** The
+  first-boot port was picked at random from a range where Windows reserves
+  blocks (Hyper-V, WinNAT); binding one failed with `EACCES`, which was not
+  retried, so the launcher reported "server did not start" at random. First
+  boot now lets the OS pick the port, `EACCES` falls back like `EADDRINUSE`,
+  and a failed start prints the server's own error. The smoke test gains a
+  Windows check on a real reserved port.
+- **benchmarking-skills: runners write deliverables for real.** When the
+  orchestrator says to simulate actions (shutdown, push, deploy), that covers
+  only the named actions: every file the skill must produce is written and
+  placed in the run's output dir, and runners check the Decision Log,
+  transcript, and deliverables exist before reporting. Previously runners
+  could describe a required report instead of writing it and be scored down
+  for a harness gap.
+
 ## [0.11.0] — 2026-09-24
 
 ### Added
@@ -129,6 +147,7 @@ aims to follow [Semantic Versioning](https://semver.org/).
 - Initial repo scaffold: manifests, MIT license, and the first workflow skills
   (`start-work`, `benchmarking-skills`, `creating-workflow-skills`).
 
+[0.11.1]: https://github.com/Gaxia-XP/gaxia-skills/releases
 [0.11.0]: https://github.com/Gaxia-XP/gaxia-skills/releases
 [0.10.0]: https://github.com/Gaxia-XP/gaxia-skills/releases
 [0.9.0]: https://github.com/Gaxia-XP/gaxia-skills/releases
