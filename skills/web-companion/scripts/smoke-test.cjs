@@ -110,6 +110,21 @@ function helperKey(cookie, port) {
     check('gate: good key -> cookie + redirect', boot.status === 302 &&
       String(boot.headers['set-cookie']).startsWith('companion-key-' + j.port + '='));
 
+    if (process.platform === 'win32') {
+      // Windows reserves TCP port blocks (Hyper-V, WinNAT) where listen fails
+      // with EACCES, not EADDRINUSE; the server must fall back, not exit.
+      const out = execFileSync('netsh', ['int', 'ipv4', 'show', 'excludedportrange', 'protocol=tcp'], { encoding: 'utf-8' });
+      const reserved = (out.match(/^\s*\d+\s+\d+/gm) || []).map(l => Number(l.trim().split(/\s+/)[0])).find(p => p > 1023);
+      if (reserved) {
+        const rdir = fs.mkdtempSync(path.join(os.tmpdir(), 'web-companion-smoke-'));
+        let r = null;
+        try { r = launch(rdir, '--port', String(reserved)); pids.push(r.pid); } catch (e) { /* checked below */ }
+        check('boot: reserved port ' + reserved + ' (EACCES) falls back instead of exiting', !!r && r.port !== reserved);
+        if (r) execFileSync(process.execPath, [LAUNCHER, '--session-dir', rdir, '--stop']);
+        fs.rmSync(rdir, { recursive: true, force: true, maxRetries: 5 });
+      } else console.log('SKIP: no reserved TCP port range to test the EACCES fallback');
+    }
+
     const again = launch(dir);
     check('launcher: live server reused, not duplicated', again.reused === true && again.pid === j.pid && again.url === j.url);
 
