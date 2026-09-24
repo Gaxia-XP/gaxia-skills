@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Repo checks + Python tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pytest
+      - name: Repo consistency (manifests, frontmatter, README, CHANGELOG)
+        run: python scripts/check_repo.py
+      - name: Python tests
+        run: python -m pytest -q
+
+  web-companion:
+    name: web-companion smoke (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Syntax
+        run: |
+          node --check skills/web-companion/scripts/companion-server.cjs
+          node --check skills/web-companion/scripts/companion-helper.js
+          node --check skills/web-companion/scripts/start-companion.cjs
+      - name: Smoke test
+        run: node skills/web-companion/scripts/smoke-test.cjs
+      - name: PowerShell wrapper (start, reuse, stop)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $dir = Join-Path $env:RUNNER_TEMP 'wc-ps1'
+          $a = .\skills\web-companion\scripts\start-companion.ps1 -SessionDir $dir | ConvertFrom-Json
+          if ($a.url -notmatch '\?key=[a-f0-9]+$') { throw "no keyed URL: $($a.url)" }
+          $b = .\skills\web-companion\scripts\start-companion.ps1 -SessionDir $dir | ConvertFrom-Json
+          if (-not $b.reused -or $b.pid -ne $a.pid) { throw 'live server was not reused' }
+          .\skills\web-companion\scripts\start-companion.ps1 -SessionDir $dir -Stop | Out-Null
+          if (-not (Test-Path (Join-Path $dir 'state\server-stopped'))) { throw 'stop did not mark the session stopped' }
+          if (Get-Process -Id $a.pid -ErrorAction SilentlyContinue) { throw 'server still running after stop' }
