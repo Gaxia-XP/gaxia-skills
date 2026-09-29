@@ -24,22 +24,12 @@ the agent's own docs before acting; do not assume they exist.
    current state must exist before anything is overwritten (a web restore
    may auto-create one — verify it, don't assume it).
 3. One gate at a time. No step starts until the previous step's check passes
-   with evidence. If a gate fails twice, stop and escalate. If a gate cannot
-   pass yet (no network, a missing token, approval not given), stop and report
-   which check blocks it instead of working around it in the next step.
-   Violating the letter of this rule — even by only writing a file for a later
-   step — violates its intent.
+   with evidence. If a gate fails twice, stop and escalate.
 4. Verify by effect, not by success message. Schedulers, installers, and
    CLIs report success for operations that did nothing — check the artifact.
 5. Ask before external effects. Installing network software (a tailnet
    client), deleting data, restoring over live state, and calling write or
    paid APIs need the user's explicit go-ahead. Read-only checks do not.
-
-| Excuse | Reality |
-|---|---|
-| "Writing this file changes no live state, so it isn't starting the step" | Rule 3 gates on order, not blast radius |
-| "Step 2's start command is the restart script's content, so drafting it now is prep" | Keep it in a scratch note; the persistent Step 3 file comes after Step 2's gate |
-| "The disk or tailnet problem blocks Step 2, so Step 3 must be analyzed first" | Diagnosing a Step 2 blocker is still Step 2 work |
 
 ## Step 1 — Inventory the machine
 
@@ -80,9 +70,7 @@ Do only what this deployment needs:
 
 **Exit:** disk usage below ~70% (or the user accepted the current level),
 every lifeline the user asked for is reachable, and the restart script has
-been run once successfully. If a live run is unsafe (it would restart the
-agent now), run it against a stub of the start command — a syntax check
-alone (`sh -n`) does not count.
+been run once successfully.
 
 ## Robustness
 
