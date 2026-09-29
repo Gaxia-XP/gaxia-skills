@@ -4,6 +4,21 @@ All notable changes to **gaxia-skills** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/), and the project
 aims to follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+- **Benchmark-driven tightening of three skills.** Each fix targets the
+  weakest scenario from a benchmark of the four newest skills and was
+  re-run to confirm it:
+  - **lessons-capture:** only the Pitfalls-patch branch waits for approval;
+    the durable-memory write happens right away, even when the user says
+    "don't note it anywhere else". Step 1 adds a one-clause "would it
+    recur?" check before filing.
+  - **web-companion:** a changed screen always gets a new filename, including
+    your own fixes before the user has opened the URL.
+  - **pick-skill:** steps 1-4 use only the skill list and the request; the
+    user's repo is not read until the pick is announced.
+
 ## [0.11.1] — 2026-09-24
 
 ### Fixed

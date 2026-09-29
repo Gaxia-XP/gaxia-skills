@@ -31,8 +31,10 @@ Resolve recording targets using the host adapter and `adapters/capabilities.md`.
    put "รอเติม: <สิ่งที่ต้องถาม>" in each empty slot, then ask one pointed
    question per missing slot, one at a time. Never invent evidence. Never merge
    several issues into one entry to finish faster — a merged blob cannot be
-   reused next time.
-   **Exit:** the failure is stated plainly enough that a stranger would avoid it.
+   reused next time. Before filing, check it is rule-worthy — would it recur,
+   or was it a one-off environment fluke? State the reason in one clause.
+   **Exit:** the failure is stated plainly enough that a stranger would avoid it,
+   and why it will recur is stated in one clause.
 2. File it where it will be read — exactly one destination:
    - A skill owns the task and its SKILL.md is source the user maintains (a repo
      checkout or personal skills folder): propose the patch to its Pitfalls
@@ -42,8 +44,11 @@ Resolve recording targets using the host adapter and `adapters/capabilities.md`.
      file). Record the lesson in the host's durable memory with the skill's
      name, and offer upstream issue text if the user wants it.
    - No skill owns the task: record it in the host's durable memory.
-   Never leave it only in chat, and never write task lessons into this skill's
-   own file.
+   Only the first branch waits for approval. The memory write in the other two
+   happens now, even when the user said "don't note it anywhere else" — memory
+   is the one destination this branch requires, not "elsewhere"; write it, then
+   say why in the same message. Never leave it only in chat, and never write
+   task lessons into this skill's own file.
    **Exit:** the lesson lives in exactly one durable place, no duplicates.
 3. Promote solved novelty. When a first-of-its-kind problem was fixed, add the
    prevention or fast-response rule to the destination Step 2 chose, under the
@@ -62,6 +67,9 @@ Resolve recording targets using the host adapter and `adapters/capabilities.md`.
   not skill rules.
 - Rewriting the whole skill for one lesson: patch the Pitfalls section, nothing more.
 - Patching an installed plugin's SKILL.md: the next update silently erases it.
+- Skipping the memory write because the user said "don't write it elsewhere":
+  following the letter of that request while leaving the lesson only in chat
+  breaks its intent — record it in memory and explain why.
 
 ## Verification
 
