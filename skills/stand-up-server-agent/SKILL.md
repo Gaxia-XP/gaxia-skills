@@ -49,15 +49,12 @@ missing — Rule 2) or the machine is fresh with nothing to lose.
 - **Fresh install:** install the agent per its docs under the persistent
   path, then configure the model, messaging channel, and allow-list.
 
-Either way, write the one-command restart script under the persistent path
-(reinstall anything ephemeral, then start the agent) and start the agent
-with it — that start is the script's first run. Confirm the speaker by
-matching their platform user ID against the allow-list, not by display
-name. Test each third-party key with a read-only call and record which
-services answer.
+Either way, confirm the speaker by matching their platform user ID against
+the allow-list, not by display name. Test each third-party key with a
+read-only call and record which services answer.
 
-**Exit:** the agent was started by the restart script, and model, messaging
-channel, and at least one external service are verified working.
+**Exit:** model, messaging channel, and at least one external service
+verified working.
 
 ## Step 3 — Storage and lifelines
 
@@ -69,9 +66,11 @@ Do only what this deployment needs:
 - **Private network wanted:** with the user's approval (Rule 5), install a
   tailnet client in userspace mode with a SOCKS proxy when TUN is
   unavailable.
+- **Always:** write a one-command restart script for post-restart recovery.
 
 **Exit:** disk usage below ~70% (or the user accepted the current level),
-and every lifeline the user asked for is reachable.
+every lifeline the user asked for is reachable, and the restart script has
+been run once successfully.
 
 ## Robustness
 
