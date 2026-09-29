@@ -25,9 +25,10 @@ the agent's own docs before acting; do not assume they exist.
    may auto-create one — verify it, don't assume it).
 3. One gate at a time. No step starts until the previous step's check passes
    with evidence. If a gate fails twice, stop and escalate. If a gate cannot
-   pass at all (a check is blocked or simulated), stop and report which check
-   blocks it instead of starting the next step. Violating the letter of this
-   rule — even by only writing a file for a later step — violates its intent.
+   pass yet (no network, a missing token, approval not given), stop and report
+   which check blocks it instead of working around it in the next step.
+   Violating the letter of this rule — even by only writing a file for a later
+   step — violates its intent.
 4. Verify by effect, not by success message. Schedulers, installers, and
    CLIs report success for operations that did nothing — check the artifact.
 5. Ask before external effects. Installing network software (a tailnet

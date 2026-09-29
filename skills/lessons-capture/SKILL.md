@@ -47,8 +47,8 @@ Resolve recording targets using the host adapter and `adapters/capabilities.md`.
    Only the first branch waits for approval. The memory write in the other two
    happens now, even when the user said "don't note it anywhere else" — memory
    is the one destination this branch requires, not "elsewhere"; write it, then
-   say why in the same message. Never leave it only in chat, and never write task lessons into this skill's
-   own file.
+   say why in the same message. Never leave it only in chat, and never write
+   task lessons into this skill's own file.
    **Exit:** the lesson lives in exactly one durable place, no duplicates.
 3. Promote solved novelty. When a first-of-its-kind problem was fixed, add the
    prevention or fast-response rule to the destination Step 2 chose, under the
