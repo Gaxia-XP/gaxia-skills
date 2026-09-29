@@ -4,7 +4,7 @@ All notable changes to **gaxia-skills** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/), and the project
 aims to follow [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.11.2] — 2026-09-29
 
 ### Changed
 - **Benchmark-driven tightening of three skills.** Each fix targets the
