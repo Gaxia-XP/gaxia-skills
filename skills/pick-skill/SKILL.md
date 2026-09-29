@@ -25,6 +25,11 @@ adapter (`adapters/`); never claim a skill ran that the host cannot load.
 
 ## Procedure
 
+Steps 1-4 work from the host skill list, the adapters, and the user's message
+only. Don't open the user's repo or workspace files until the step 4 announce
+line is written — if judging fit seems to need repo context, that read belongs
+to the plan after the pick, not to choosing.
+
 1. List candidates. Get the host's skill list (names plus one-line descriptions
    only, not full bodies). Look at installed skills first; list installable
    external skills only when none installed fits and the host can install.
@@ -73,5 +78,6 @@ adapter (`adapters/`); never claim a skill ran that the host cannot load.
 
 ## Verification
 
-- The pick plus its one-sentence reason is stated before any task work begins.
+- The pick plus its one-sentence reason is stated before any task work begins,
+  and no workspace file was read before that line.
 - The loaded skill's own verification gate passes at the end of the task.

@@ -40,7 +40,7 @@ Keep the session dir outside the project's git tree (or gitignore `.web-companio
 2. **Write one new screen** to `screen_dir`. Full HTML documents only, offline: no CDN or hotlinked assets — use the vendored theme via `/theme/…` and inline your own CSS/JS. Batch a whole step-sequence into ONE screen with client-side steps/tabs — each push costs a chat round-trip, so never split one flow across many screens.
 3. **End your turn**: repeat the URL, one-line summary of the screen, and the one-word chat nudge the page shows (e.g. `เสร็จแล้ว`). The nudge carries no content — content lives in `state/events`.
 4. **Next turn**: read `state/events` FIRST — pushing a new screen wipes it. Merge clicks/answers with their chat nudge.
-5. **Iterate**: changed screen = new filename (`layout-v2.html`). Only advance when the step is validated.
+5. **Iterate**: changed screen = new filename (`layout-v2.html`). Only advance when the step is validated. This holds for your own pre-publish fixes too — patching a written screen in place (sed, edit) before the user has seen the URL is still reusing a filename.
 
 ## Screen Rules
 - Style lesson screens with the vendored Bootstrap theme, served offline by the companion server: `<link rel="stylesheet" href="/theme/bootstrap.min.css">` (never a CDN link). Lock dark mode — `<html data-bs-theme="dark">` + `<meta name="color-scheme" content="dark">` — so it matches the Tomorrow code theme; never mix a light page with dark code blocks. Use Bootstrap components (container/card/alert/list-group/badge/buttons) with semantic HTML. Lesson-specific CSS (checklist `<details>`, SVG tweaks) goes in a `<style>` after the link.
@@ -69,6 +69,7 @@ No file = the user didn't click anything; use only their chat nudge.
 | Mistake | Fix |
 |---|---|
 | Reusing a screen filename | Always a fresh file — the server keys off newest mtime |
+| "No one has seen it yet, so patching it in place is fine" | Unconditional: write `name-v2.html` instead of editing the pushed file |
 | Reading events after pushing | Read first; each push clears the file |
 | Sharing the URL without `?key=` | Always the complete URL from server-info |
 | External fonts/CDN in screens | Vendored theme via `/theme/…`, everything else inline; localhost must stand alone |
