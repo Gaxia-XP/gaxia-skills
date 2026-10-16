@@ -4,7 +4,7 @@ All notable changes to **gaxia-skills** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/), and the project
 aims to follow [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.12.0] — 2026-10-16
 
 ### Added
 - **productions:** gated live operations on a production service. It covers
