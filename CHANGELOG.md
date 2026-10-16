@@ -4,6 +4,19 @@ All notable changes to **gaxia-skills** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/), and the project
 aims to follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- **productions:** gated live operations on a production service. It covers
+  code-only backend deploys (clean export, proven backup, hash-checked
+  install, invariant balances, smoke test, supervised restart), frontend
+  deploys checked byte for byte against the build, switching a payment
+  provider's test mode on the live stack, removing test purchases (dry-run
+  counts, one transaction, tombstoned reconciler ids so a deleted payment
+  doesn't come back), rollback and a live-state record. Every outward action
+  needs its own authorization in the conversation. A project supplies its
+  concrete commands in a profile.
+
 ## [0.11.2] — 2026-09-29
 
 ### Changed

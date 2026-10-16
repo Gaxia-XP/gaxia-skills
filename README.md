@@ -24,6 +24,7 @@ Codex additionally have native manifests in this repository.
 | `lessons-capture` | Turn failed attempts and novel fixes into durable, reusable rules. |
 | `stand-up-server-agent` | Install or recover a persistent self-hosted AI assistant on a server. |
 | `cut-release` | Publish a version: bump every manifest, write the changelog entry, tag the verified commit. |
+| `productions` | Run gated live operations: deploy backend and frontend, switch payment test mode, remove test data, roll back. |
 
 ## Compatibility
 
