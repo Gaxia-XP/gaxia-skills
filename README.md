@@ -25,6 +25,7 @@ Codex additionally have native manifests in this repository.
 | `stand-up-server-agent` | Install or recover a persistent self-hosted AI assistant on a server. |
 | `cut-release` | Publish a version: bump every manifest, write the changelog entry, tag the verified commit. |
 | `productions` | Run gated live operations: deploy backend and frontend, switch payment test mode, remove test data, roll back. |
+| `handoff-read-map` | Write a handoff that maps each next action to the doc section to read first, with receiver gates. |
 
 ## Compatibility
 
