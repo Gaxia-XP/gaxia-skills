@@ -16,6 +16,7 @@
     "./skills/lessons-capture",
     "./skills/stand-up-server-agent",
     "./skills/cut-release",
-    "./skills/productions"
+    "./skills/productions",
+    "./skills/handoff-read-map"
   ]
 }
