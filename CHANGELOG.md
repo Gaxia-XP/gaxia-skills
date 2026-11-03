@@ -6,6 +6,12 @@ aims to follow [Semantic Versioning](https://semver.org/).
 
 ## [0.13.0] — 2026-11-02
 
+### Added
+- **handoff-read-map:** a handoff built around a "Read before acting" map
+  (before you… | file → section | why), with pass/fail gates for the receiving
+  agent: read the governing sections first, the design wins over half-built
+  code, quote the section before asking the owner, re-read on pushback.
+
 ### Changed
 - **think-first: the owner's four rules.** The skill now teaches exactly four
   rules, in this order: ไม่ทำเกินที่ขอ (do no more than was asked),
