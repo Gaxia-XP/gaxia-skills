@@ -4,6 +4,32 @@ All notable changes to **gaxia-skills** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/), and the project
 aims to follow [Semantic Versioning](https://semver.org/).
 
+## [0.13.0] — 2026-11-02
+
+### Added
+- **handoff-read-map:** a handoff built around a "Read before acting" map
+  (before you… | file → section | why), with pass/fail gates for the receiving
+  agent: read the governing sections first, the design wins over half-built
+  code, quote the section before asking the owner, re-read on pushback.
+
+### Changed
+- **think-first: the owner's four rules.** The skill now teaches exactly four
+  rules, in this order: ไม่ทำเกินที่ขอ (do no more than was asked),
+  ไม่ชัดให้ถามก่อน ห้ามเดา (ask instead of guessing when anything is unclear),
+  ไม่แก้ส่วนที่ไม่ได้สั่ง (don't change what wasn't asked), and
+  ก่อนบอกว่าเสร็จให้ตรวจก่อน แล้วบอกว่าตรวจอะไร (check before saying done, and
+  say what was checked). Rule 2 now stops and asks instead of stating an
+  assumption and carrying on; rule 4 now requires the final report to name the
+  check and its result. The trivial-task escape now skips only the ceremony,
+  never the rules.
+- **ship-it-and-shutdown: check-in registry.** Only the last session still
+  checked in powers the machine off (`scripts/checkin.sh`, `SHIP_IT_STALE_MIN`,
+  `SHIP_IT_DRY_RUN`).
+
+### Notes
+- Version bumped across `.claude-plugin/plugin.json`,
+  `.claude-plugin/marketplace.json`, and `.codex-plugin/plugin.json`.
+
 ## [0.12.0] — 2026-10-16
 
 ### Added
